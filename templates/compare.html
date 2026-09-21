@@ -1,0 +1,1036 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+/* =========================================================
+   MAIN PAGE
+========================================================= */
+
+.compare-page {
+    width: 100%;
+    min-height: 100vh;
+    padding-bottom: 70px;
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.compare-title {
+    text-align: center;
+    padding: 35px 15px 25px;
+}
+
+.compare-title h1 {
+    color: #ff6a00;
+    font-size: 36px;
+    margin: 0 0 10px;
+}
+
+.compare-title p {
+    color: #aaa;
+    font-size: 17px;
+    margin: 0;
+}
+
+
+/* =========================================================
+   SELECTION BOX
+========================================================= */
+
+.selection-box {
+    width: 90%;
+    max-width: 1100px;
+    margin: 0 auto 45px;
+
+    background: #1c1c1c;
+
+    border: 1px solid #333;
+
+    border-radius: 12px;
+
+    padding: 30px;
+
+    box-sizing: border-box;
+}
+
+.selection-box h2 {
+    color: #ff6a00;
+
+    font-size: 25px;
+
+    margin: 0 0 25px;
+}
+
+
+/* =========================================================
+   BIKE SELECTION GRID
+========================================================= */
+
+.selection-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 18px;
+}
+
+
+.selection-group {
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+.selection-group label {
+
+    color: #ccc;
+
+    font-size: 15px;
+
+    margin-bottom: 8px;
+
+    font-weight: bold;
+}
+
+
+.selection-group select {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 14px;
+
+    background: #252525;
+
+    color: white;
+
+    border: 1px solid #444;
+
+    border-radius: 7px;
+
+    font-size: 14px;
+
+    outline: none;
+}
+
+
+.selection-group select:focus {
+
+    border-color: #ff6a00;
+}
+
+
+/* =========================================================
+   COMPARE BUTTON
+========================================================= */
+
+.compare-button {
+
+    width: 100%;
+
+    margin-top: 25px;
+
+    padding: 15px;
+
+    background: #ff6a00;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 7px;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+
+.compare-button:hover {
+
+    background: #e65c00;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 5px 20px
+        rgba(255,106,0,0.25);
+}
+
+
+/* =========================================================
+   COMPARISON SECTION
+========================================================= */
+
+.comparison-section {
+
+    width: 94%;
+
+    max-width: 1450px;
+
+    margin: 0 auto;
+}
+
+
+.comparison-title {
+
+    text-align: center;
+
+    color: #ff6a00;
+
+    font-size: 30px;
+
+    font-weight: bold;
+
+    margin-bottom: 30px;
+}
+
+
+/* =========================================================
+   COMPARISON GRID
+========================================================= */
+
+.comparison-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 22px;
+}
+
+
+/* =========================================================
+   BIKE COMPARISON CARD
+========================================================= */
+
+.comparison-card {
+
+    background: #1c1c1c;
+
+    border: 1px solid #333;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    transition: 0.3s;
+}
+
+
+.comparison-card:hover {
+
+    border-color: #ff6a00;
+
+    transform: translateY(-5px);
+
+    box-shadow:
+        0 10px 30px
+        rgba(255,106,0,0.18);
+}
+
+
+/* =========================================================
+   IMAGE
+========================================================= */
+
+.comparison-image {
+
+    width: 100%;
+
+    height: 250px;
+
+    background: #080808;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+
+.comparison-image img {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: contain;
+
+    object-position: center;
+
+    display: block;
+}
+
+
+.image-error {
+
+    width: 100%;
+
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: #777;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   BIKE NAME
+========================================================= */
+
+.card-info {
+
+    padding: 20px;
+}
+
+
+.brand {
+
+    color: #ff6a00;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+
+    margin-bottom: 5px;
+}
+
+
+.model {
+
+    color: white;
+
+    font-size: 24px;
+
+    font-weight: bold;
+
+    margin-bottom: 20px;
+}
+
+
+/* =========================================================
+   SPECIFICATIONS
+========================================================= */
+
+.spec-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+
+.spec-row {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    background: #252525;
+
+    padding: 12px;
+
+    border-radius: 6px;
+
+    gap: 10px;
+}
+
+
+.spec-label {
+
+    color: #999;
+
+    font-size: 13px;
+}
+
+
+.spec-value {
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    text-align: right;
+}
+
+
+/* =========================================================
+   PRICE
+========================================================= */
+
+.price {
+
+    color: #ff6a00;
+
+    font-size: 23px;
+
+    font-weight: bold;
+
+    margin: 20px 0 12px;
+}
+
+
+/* =========================================================
+   AVAILABILITY
+========================================================= */
+
+.available {
+
+    color: #4caf50;
+
+    font-weight: bold;
+
+    margin-bottom: 15px;
+}
+
+
+.not-available {
+
+    color: #f44336;
+
+    font-weight: bold;
+
+    margin-bottom: 15px;
+}
+
+
+/* =========================================================
+   DETAILS BUTTON
+========================================================= */
+
+.details-button {
+
+    display: block;
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    text-align: center;
+
+    text-decoration: none;
+
+    color: white;
+
+    background: #ff6a00;
+
+    padding: 11px;
+
+    border-radius: 6px;
+
+    font-weight: bold;
+
+    transition: 0.3s;
+}
+
+
+.details-button:hover {
+
+    background: #e65c00;
+}
+
+
+/* =========================================================
+   NO SELECTION
+========================================================= */
+
+.no-selection {
+
+    width: 90%;
+
+    max-width: 800px;
+
+    margin: 20px auto 60px;
+
+    padding: 35px;
+
+    box-sizing: border-box;
+
+    background: #1c1c1c;
+
+    border: 1px solid #333;
+
+    border-radius: 12px;
+
+    text-align: center;
+
+    color: #aaa;
+
+    font-size: 17px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width: 900px) {
+
+    .selection-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+    .comparison-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media(max-width: 600px) {
+
+    .compare-title h1 {
+
+        font-size: 29px;
+    }
+
+    .compare-title p {
+
+        font-size: 15px;
+    }
+
+    .selection-box {
+
+        width: 94%;
+
+        padding: 20px;
+    }
+
+    .comparison-section {
+
+        width: 94%;
+    }
+
+    .comparison-image {
+
+        height: 230px;
+    }
+
+}
+
+</style>
+
+
+<div class="compare-page">
+
+
+    <!-- =====================================================
+         TITLE
+    ====================================================== -->
+
+    <div class="compare-title">
+
+        <h1>
+            🏍️ Compare Bikes
+        </h1>
+
+        <p>
+            Select up to three bikes and compare their
+            specifications side by side
+        </p>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         SELECTION BOX
+    ====================================================== -->
+
+    <div class="selection-box">
+
+        <h2>
+            Select Bikes
+        </h2>
+
+
+        <form
+            method="POST"
+            action="{{ url_for('compare') }}"
+        >
+
+
+            <div class="selection-grid">
+
+
+                <!-- BIKE 1 -->
+
+                <div class="selection-group">
+
+                    <label for="bike1">
+                        Bike 1
+                    </label>
+
+
+                    <select
+                        id="bike1"
+                        name="bike_ids"
+                        required
+                    >
+
+                        <option value="">
+                            Select Bike 1
+                        </option>
+
+
+                        {% for bike in bikes %}
+
+                        <option value="{{ bike[0] }}">
+
+                            {{ bike[1] }}
+                            -
+                            {{ bike[2] }}
+                            ({{ bike[3] }} CC)
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- BIKE 2 -->
+
+                <div class="selection-group">
+
+                    <label for="bike2">
+                        Bike 2
+                    </label>
+
+
+                    <select
+                        id="bike2"
+                        name="bike_ids"
+                        required
+                    >
+
+                        <option value="">
+                            Select Bike 2
+                        </option>
+
+
+                        {% for bike in bikes %}
+
+                        <option value="{{ bike[0] }}">
+
+                            {{ bike[1] }}
+                            -
+                            {{ bike[2] }}
+                            ({{ bike[3] }} CC)
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- BIKE 3 -->
+
+                <div class="selection-group">
+
+                    <label for="bike3">
+                        Bike 3
+                        <span
+                            style="
+                                color:#777;
+                                font-weight:normal;
+                            "
+                        >
+                            (Optional)
+                        </span>
+                    </label>
+
+
+                    <select
+                        id="bike3"
+                        name="bike_ids"
+                    >
+
+                        <option value="">
+                            No Third Bike
+                        </option>
+
+
+                        {% for bike in bikes %}
+
+                        <option value="{{ bike[0] }}">
+
+                            {{ bike[1] }}
+                            -
+                            {{ bike[2] }}
+                            ({{ bike[3] }} CC)
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 BUTTON
+            ================================================== -->
+
+            <button
+                type="submit"
+                class="compare-button"
+            >
+
+                ⚖️ Compare Selected Bikes
+
+            </button>
+
+
+        </form>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         RESULTS
+    ====================================================== -->
+
+    {% if selected_bikes %}
+
+
+    <div class="comparison-section">
+
+
+        <div class="comparison-title">
+
+            ⚖️ Bike Comparison
+
+        </div>
+
+
+        <div class="comparison-grid">
+
+
+            {% for bike in selected_bikes %}
+
+
+            <div class="comparison-card">
+
+
+                <!-- =================================================
+                     IMAGE
+
+                     Uses the same folder-based image system
+                     as Bike Details and Recommendation.
+                ================================================== -->
+
+                <div class="comparison-image">
+
+
+                    <img
+                        src="{{ url_for(
+                            'bike_recommendation_image',
+                            bike_id=bike[0]
+                        ) }}"
+                        alt="{{ bike[1] }} {{ bike[2] }}"
+                        loading="lazy"
+
+                        onerror="
+                            this.style.display='none';
+                            this.parentElement.querySelector('.image-error').style.display='flex';
+                        "
+                    >
+
+
+                    <div
+                        class="image-error"
+                        style="display:none;"
+                    >
+
+                        Image unavailable
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     INFORMATION
+                ================================================== -->
+
+                <div class="card-info">
+
+
+                    <div class="brand">
+
+                        {{ bike[1] }}
+
+                    </div>
+
+
+                    <div class="model">
+
+                        {{ bike[2] }}
+
+                    </div>
+
+
+
+                    <div class="spec-list">
+
+
+                        <!-- PRICE -->
+
+                        <div class="spec-row">
+
+                            <span class="spec-label">
+                                Price
+                            </span>
+
+                            <span class="spec-value"
+                                  style="color:#ff6a00;">
+
+                                ₹{{ "{:,.0f}".format(bike[4]) }}
+
+                            </span>
+
+                        </div>
+
+
+
+                        <!-- ENGINE -->
+
+                        <div class="spec-row">
+
+                            <span class="spec-label">
+                                Engine
+                            </span>
+
+                            <span class="spec-value">
+
+                                {{ bike[3] }} CC
+
+                            </span>
+
+                        </div>
+
+
+
+                        <!-- MILEAGE -->
+
+                        <div class="spec-row">
+
+                            <span class="spec-label">
+                                Mileage
+                            </span>
+
+                            <span class="spec-value">
+
+                                {{ bike[5] }} km/l
+
+                            </span>
+
+                        </div>
+
+
+
+                        <!-- POWER -->
+
+                        <div class="spec-row">
+
+                            <span class="spec-label">
+                                Power
+                            </span>
+
+                            <span class="spec-value">
+
+                                {{ bike[6] }}
+
+                            </span>
+
+                        </div>
+
+
+
+                        <!-- TORQUE -->
+
+                        <div class="spec-row">
+
+                            <span class="spec-label">
+                                Torque
+                            </span>
+
+                            <span class="spec-value">
+
+                                {{ bike[7] }}
+
+                            </span>
+
+                        </div>
+
+
+
+                        <!-- FUEL -->
+
+                        <div class="spec-row">
+
+                            <span class="spec-label">
+                                Fuel Capacity
+                            </span>
+
+                            <span class="spec-value">
+
+                                {{ bike[8] }} L
+
+                            </span>
+
+                        </div>
+
+
+
+                        <!-- AVAILABILITY -->
+
+                        <div class="spec-row">
+
+                            <span class="spec-label">
+                                Availability
+                            </span>
+
+
+                            {% if bike[9] == "Available" %}
+
+                            <span
+                                class="spec-value"
+                                style="color:#4caf50;"
+                            >
+
+                                ✓ Available
+
+                            </span>
+
+                            {% else %}
+
+                            <span
+                                class="spec-value"
+                                style="color:#f44336;"
+                            >
+
+                                ✕ Not Available
+
+                            </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- DETAILS -->
+
+                    <div style="margin-top:20px;">
+
+                        <a
+                            href="{{ url_for(
+                                'bike_details',
+                                bike_id=bike[0]
+                            ) }}"
+                            class="details-button"
+                        >
+
+                            View Details
+
+                        </a>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+            {% endfor %}
+
+
+        </div>
+
+
+    </div>
+
+
+    {% else %}
+
+
+    <!-- =====================================================
+         INITIAL MESSAGE
+    ====================================================== -->
+
+    <div class="no-selection">
+
+        🏍️ Select two or three bikes above to start comparing.
+
+        <br>
+        <br>
+
+        You can compare price, engine,
+        mileage, power, torque and fuel capacity.
+
+    </div>
+
+
+    {% endif %}
+
+
+</div>
+
+
+{% endblock %}

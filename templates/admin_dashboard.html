@@ -1,0 +1,1055 @@
+{% extends "admin_base.html" %}
+
+{% block title %}
+BikeHub Admin Dashboard
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    .admin-page {
+        width: 100%;
+    }
+
+
+    /* =========================================
+       HERO
+    ========================================= */
+
+    .admin-hero {
+
+        background:
+            radial-gradient(
+                circle at 85% 20%,
+                rgba(255,102,0,.20),
+                transparent 35%
+            ),
+            linear-gradient(
+                135deg,
+                #181818,
+                #202020,
+                #111111
+            );
+
+        border: 1px solid #343434;
+
+        border-radius: 24px;
+
+        padding: 42px;
+
+        margin-bottom: 24px;
+
+        overflow: hidden;
+
+        position: relative;
+    }
+
+
+    .admin-hero:after {
+
+        content: "";
+
+        position: absolute;
+
+        width: 240px;
+
+        height: 240px;
+
+        right: -80px;
+
+        top: -100px;
+
+        border-radius: 50%;
+
+        background:
+            rgba(255,102,0,.08);
+
+    }
+
+
+    .hero-tag {
+
+        display: inline-block;
+
+        padding: 8px 14px;
+
+        border-radius: 20px;
+
+        background:
+            rgba(255,102,0,.10);
+
+        border: 1px solid
+            rgba(255,102,0,.25);
+
+        color: #ff8538;
+
+        font-size: 12px;
+
+        font-weight: 800;
+
+        letter-spacing: 1px;
+    }
+
+
+    .admin-hero h1 {
+
+        margin-top: 18px;
+
+        margin-bottom: 10px;
+
+        font-size: 48px;
+
+        color: #ffffff;
+    }
+
+
+    .admin-hero h1 span {
+
+        color: #ff6600;
+    }
+
+
+    .admin-hero p {
+
+        max-width: 750px;
+
+        color: #999999;
+
+        line-height: 1.7;
+
+        font-size: 15px;
+    }
+
+
+    /* =========================================
+       STATUS ROW
+    ========================================= */
+
+    .status-row {
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(4, 1fr);
+
+        gap: 16px;
+
+        margin-bottom: 32px;
+    }
+
+
+    .status-box {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 14px;
+
+        text-decoration: none;
+
+        color: white;
+
+        padding: 19px;
+
+        border-radius: 16px;
+
+        background: #181818;
+
+        border: 1px solid #303030;
+
+        transition: .25s;
+    }
+
+
+    .status-box:hover {
+
+        border-color: #ff6600;
+
+        transform:
+            translateY(-4px);
+    }
+
+
+    .status-icon {
+
+        width: 48px;
+
+        height: 48px;
+
+        flex-shrink: 0;
+
+        display: grid;
+
+        place-items: center;
+
+        border-radius: 13px;
+
+        background:
+            rgba(255,102,0,.10);
+
+        font-size: 23px;
+    }
+
+
+    .status-box small {
+
+        display: block;
+
+        color: #777777;
+
+        font-size: 11px;
+
+        margin-bottom: 5px;
+
+        letter-spacing: .8px;
+    }
+
+
+    .status-box strong {
+
+        color: #f2f2f2;
+
+        font-size: 14px;
+    }
+
+
+    /* =========================================
+       SECTION HEADING
+    ========================================= */
+
+    .section-heading {
+
+        margin:
+            8px 2px 18px;
+    }
+
+
+    .section-heading h2 {
+
+        color: #ffffff;
+
+        font-size: 26px;
+
+        margin: 0;
+    }
+
+
+    .section-heading p {
+
+        margin: 5px 0;
+
+        color: #777777;
+
+        font-size: 13px;
+    }
+
+
+    /* =========================================
+       ADMIN GRID
+    ========================================= */
+
+    .admin-grid {
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(3, 1fr);
+
+        gap: 20px;
+    }
+
+
+    /* =========================================
+       ADMIN CARD
+    ========================================= */
+
+    .admin-card {
+
+        position: relative;
+
+        overflow: hidden;
+
+        min-height: 255px;
+
+        padding: 28px;
+
+        border-radius: 22px;
+
+        background:
+            linear-gradient(
+                145deg,
+                rgba(255,255,255,.035),
+                rgba(255,255,255,.012)
+            ),
+            #181818;
+
+        border: 1px solid #303030;
+
+        transition: .25s;
+    }
+
+
+    .admin-card:after {
+
+        content: "";
+
+        position: absolute;
+
+        width: 130px;
+
+        height: 130px;
+
+        right: -55px;
+
+        bottom: -65px;
+
+        border-radius: 50%;
+
+        background:
+            rgba(255,102,0,.07);
+    }
+
+
+    .admin-card:hover {
+
+        transform:
+            translateY(-7px);
+
+        border-color:
+            #ff6600;
+
+        box-shadow:
+            0 20px 45px
+            rgba(0,0,0,.35);
+    }
+
+
+    .card-top {
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        margin-bottom: 22px;
+    }
+
+
+    .card-icon {
+
+        width: 64px;
+
+        height: 64px;
+
+        display: grid;
+
+        place-items: center;
+
+        border-radius: 18px;
+
+        background:
+            linear-gradient(
+                145deg,
+                rgba(255,102,0,.18),
+                rgba(255,102,0,.06)
+            );
+
+        border:
+            1px solid
+            rgba(255,102,0,.28);
+
+        font-size: 31px;
+    }
+
+
+    .card-number {
+
+        color: #555555;
+
+        font-size: 12px;
+
+        font-weight: 800;
+
+        letter-spacing: 1px;
+    }
+
+
+    .admin-card h3 {
+
+        margin:
+            0 0 9px;
+
+        color: #ffffff;
+
+        font-size: 23px;
+    }
+
+
+    .admin-card p {
+
+        margin: 0;
+
+        color: #929292;
+
+        line-height: 1.65;
+
+        font-size: 14px;
+
+        min-height: 46px;
+    }
+
+
+    /* =========================================
+       CARD BUTTON
+    ========================================= */
+
+    .card-button {
+
+        position: relative;
+
+        z-index: 2;
+
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 8px;
+
+        margin-top: 22px;
+
+        padding: 11px 17px;
+
+        border-radius: 10px;
+
+        background: #ff6600;
+
+        color: #ffffff !important;
+
+        text-decoration: none;
+
+        font-size: 14px;
+
+        font-weight: 800;
+
+        transition: .2s;
+    }
+
+
+    .card-button:hover {
+
+        background: #ff7a1a;
+
+        transform:
+            translateX(3px);
+    }
+
+
+    /* =========================================
+       ADMIN TIP
+    ========================================= */
+
+    .admin-tip {
+
+        margin-top: 28px;
+
+        padding: 22px 25px;
+
+        border-radius: 18px;
+
+        border: 1px solid #303030;
+
+        background:
+            linear-gradient(
+                90deg,
+                #191919,
+                #211a15,
+                #191919
+            );
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 16px;
+    }
+
+
+    .tip-icon {
+
+        font-size: 30px;
+    }
+
+
+    .admin-tip h3 {
+
+        margin:
+            0 0 4px;
+
+        color: #ffffff;
+
+        font-size: 16px;
+    }
+
+
+    .admin-tip p {
+
+        margin: 0;
+
+        color: #888888;
+
+        font-size: 13px;
+    }
+
+
+    /* =========================================
+       TABLET
+    ========================================= */
+
+    @media(max-width:1050px) {
+
+        .admin-grid {
+
+            grid-template-columns:
+                repeat(2, 1fr);
+        }
+
+
+        .status-row {
+
+            grid-template-columns:
+                repeat(2, 1fr);
+        }
+
+    }
+
+
+    /* =========================================
+       MOBILE
+    ========================================= */
+
+    @media(max-width:650px) {
+
+        .admin-hero {
+
+            padding:
+                30px 24px;
+        }
+
+
+        .admin-hero h1 {
+
+            font-size: 40px;
+        }
+
+
+        .status-row {
+
+            grid-template-columns: 1fr;
+        }
+
+
+        .admin-grid {
+
+            grid-template-columns: 1fr;
+        }
+
+
+        .admin-card {
+
+            min-height: auto;
+        }
+
+
+        .admin-tip {
+
+            align-items: flex-start;
+
+            flex-direction: column;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="admin-page">
+
+
+    <!-- =========================================
+         HERO
+    ========================================== -->
+
+    <section class="admin-hero">
+
+        <div class="hero-tag">
+
+            ⚡ CONTROL CENTER
+
+        </div>
+
+
+        <h1>
+
+            Admin <span>Dashboard</span>
+
+        </h1>
+
+
+        <p>
+
+            Welcome to BikeHub administration.
+
+            Manage bikes, users, bookings,
+            customer support and database
+            information from one place.
+
+        </p>
+
+    </section>
+
+
+
+    <!-- =========================================
+         STATUS ROW
+    ========================================== -->
+
+    <section class="status-row">
+
+
+        <a
+            href="{{ url_for('admin_dashboard') }}"
+            class="status-box"
+        >
+
+            <div class="status-icon">
+                🏍️
+            </div>
+
+            <div>
+
+                <small>
+                    SYSTEM
+                </small>
+
+                <strong>
+                    BikeHub Online
+                </strong>
+
+            </div>
+
+        </a>
+
+
+
+        <a
+            href="{{ url_for('admin_database') }}"
+            class="status-box"
+        >
+
+            <div class="status-icon">
+                🗃️
+            </div>
+
+            <div>
+
+                <small>
+                    DATABASE
+                </small>
+
+                <strong>
+                    Bike Management
+                </strong>
+
+            </div>
+
+        </a>
+
+
+
+        <a
+            href="{{ url_for('admin_test_rides') }}"
+            class="status-box"
+        >
+
+            <div class="status-icon">
+                🛵
+            </div>
+
+            <div>
+
+                <small>
+                    SERVICE
+                </small>
+
+                <strong>
+                    Test Ride System
+                </strong>
+
+            </div>
+
+        </a>
+
+
+
+        <a
+            href="{{ url_for('admin_doubts') }}"
+            class="status-box"
+        >
+
+            <div class="status-icon">
+                💬
+            </div>
+
+            <div>
+
+                <small>
+                    SUPPORT
+                </small>
+
+                <strong>
+                    Customer Doubts
+                </strong>
+
+            </div>
+
+        </a>
+
+
+    </section>
+
+
+
+    <!-- =========================================
+         MANAGEMENT MODULES
+    ========================================== -->
+
+    <div class="section-heading">
+
+        <h2>
+            Management Modules
+        </h2>
+
+        <p>
+            Quick access to all administrator functions
+        </p>
+
+    </div>
+
+
+
+    <section class="admin-grid">
+
+
+        <!-- =====================================
+             01 BIKE MANAGEMENT
+        ====================================== -->
+
+        <div class="admin-card">
+
+            <div class="card-top">
+
+                <div class="card-icon">
+                    🏍️
+                </div>
+
+                <div class="card-number">
+                    01
+                </div>
+
+            </div>
+
+
+            <h3>
+                Bike Management
+            </h3>
+
+
+            <p>
+
+                Add, edit, delete and manage
+                all bikes in the BikeHub system.
+
+            </p>
+
+
+            <a
+                class="card-button"
+                href="{{ url_for('admin_bikes') }}"
+            >
+
+                Manage Bikes →
+
+            </a>
+
+        </div>
+
+
+
+        <!-- =====================================
+             02 USERS
+        ====================================== -->
+
+        <div class="admin-card">
+
+            <div class="card-top">
+
+                <div class="card-icon">
+                    👥
+                </div>
+
+                <div class="card-number">
+                    02
+                </div>
+
+            </div>
+
+
+            <h3>
+                Users
+            </h3>
+
+
+            <p>
+
+                View registered customers
+                and their account information.
+
+            </p>
+
+
+            <a
+                class="card-button"
+                href="{{ url_for('admin_users') }}"
+            >
+
+                View Users →
+
+            </a>
+
+        </div>
+
+
+
+        <!-- =====================================
+             03 DATABASE
+        ====================================== -->
+
+        <div class="admin-card">
+
+            <div class="card-top">
+
+                <div class="card-icon">
+                    🗄️
+                </div>
+
+                <div class="card-number">
+                    03
+                </div>
+
+            </div>
+
+
+            <h3>
+                Bike Database
+            </h3>
+
+
+            <p>
+
+                View complete motorcycle
+                records stored in the database.
+
+            </p>
+
+
+            <a
+                class="card-button"
+                href="{{ url_for('admin_database') }}"
+            >
+
+                View Database →
+
+            </a>
+
+        </div>
+
+
+
+        <!-- =====================================
+             04 ADD BIKE
+        ====================================== -->
+
+        <div class="admin-card">
+
+            <div class="card-top">
+
+                <div class="card-icon">
+                    ➕
+                </div>
+
+                <div class="card-number">
+                    04
+                </div>
+
+            </div>
+
+
+            <h3>
+                Add New Bike
+            </h3>
+
+
+            <p>
+
+                Add a new motorcycle with
+                complete specifications.
+
+            </p>
+
+
+            <a
+                class="card-button"
+                href="{{ url_for('add_bike') }}"
+            >
+
+                Add Bike →
+
+            </a>
+
+        </div>
+
+
+
+        <!-- =====================================
+             05 TEST RIDES
+        ====================================== -->
+
+        <div class="admin-card">
+
+            <div class="card-top">
+
+                <div class="card-icon">
+                    🛵
+                </div>
+
+                <div class="card-number">
+                    05
+                </div>
+
+            </div>
+
+
+            <h3>
+                Test Rides
+            </h3>
+
+
+            <p>
+
+                Manage customer test ride
+                bookings, dates and status.
+
+            </p>
+
+
+            <a
+                class="card-button"
+                href="{{ url_for('admin_test_rides') }}"
+            >
+
+                Test Rides →
+
+            </a>
+
+        </div>
+
+
+
+        <!-- =====================================
+             06 CUSTOMER DOUBTS
+        ====================================== -->
+
+        <div class="admin-card">
+
+            <div class="card-top">
+
+                <div class="card-icon">
+                    💬
+                </div>
+
+                <div class="card-number">
+                    06
+                </div>
+
+            </div>
+
+
+            <h3>
+                Customer Doubts
+            </h3>
+
+
+            <p>
+
+                Read customer questions
+                and send replies.
+
+            </p>
+
+
+            <a
+                class="card-button"
+                href="{{ url_for('admin_doubts') }}"
+            >
+
+                Open Support →
+
+            </a>
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- =========================================
+         ADMIN TIP
+    ========================================== -->
+
+    <div class="admin-tip">
+
+        <div class="tip-icon">
+            💡
+        </div>
+
+
+        <div>
+
+            <h3>
+                BikeHub Administration
+            </h3>
+
+            <p>
+
+                Use the modules above to manage
+                the complete BikeHub system.
+
+            </p>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+{% endblock %}

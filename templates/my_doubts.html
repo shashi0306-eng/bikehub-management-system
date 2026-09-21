@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+.doubts-container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.page-title {
+    color: #ff6600;
+    text-align: center;
+    font-size: 34px;
+    margin-bottom: 10px;
+}
+
+.page-subtitle {
+    text-align: center;
+    color: #bbbbbb;
+    margin-bottom: 30px;
+}
+
+.ask-button {
+    display: inline-block;
+    background: #ff6600;
+    color: white;
+    padding: 12px 22px;
+    border-radius: 7px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-bottom: 25px;
+}
+
+.ask-button:hover {
+    background: #e65c00;
+}
+
+.doubt-card {
+    background: #1c1c1c;
+    border: 1px solid #333333;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 22px;
+}
+
+.doubt-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.subject {
+    color: #ff6600;
+    font-size: 21px;
+    margin: 0;
+}
+
+.status {
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.pending {
+    background: #5c4700;
+    color: #ffd966;
+}
+
+.answered {
+    background: #174d2b;
+    color: #7dffa5;
+}
+
+.label {
+    color: #999999;
+    font-size: 14px;
+    margin-top: 20px;
+    margin-bottom: 5px;
+}
+
+.question {
+    color: #eeeeee;
+    line-height: 1.6;
+}
+
+.reply-box {
+    background: #111111;
+    border-left: 4px solid #ff6600;
+    padding: 15px;
+    margin-top: 15px;
+    color: #eeeeee;
+    line-height: 1.6;
+}
+
+.waiting {
+    color: #aaaaaa;
+    font-style: italic;
+}
+
+.date {
+    color: #777777;
+    font-size: 13px;
+    margin-top: 15px;
+}
+
+.no-data {
+    background: #1c1c1c;
+    text-align: center;
+    color: #bbbbbb;
+    padding: 50px;
+    border-radius: 10px;
+}
+
+</style>
+
+
+<div class="doubts-container">
+
+    <h1 class="page-title">
+        💬 My Doubts
+    </h1>
+
+    <p class="page-subtitle">
+        View your questions and admin replies.
+    </p>
+
+
+    <a
+        href="{{ url_for('ask_doubt') }}"
+        class="ask-button"
+    >
+        + Ask New Doubt
+    </a>
+
+
+    {% if doubts %}
+
+        {% for doubt in doubts %}
+
+        <div class="doubt-card">
+
+            <div class="doubt-header">
+
+                <h3 class="subject">
+                    {{ doubt[1] }}
+                </h3>
+
+
+                {% if doubt[4] == "Answered" %}
+
+                    <span class="status answered">
+                        ✓ Answered
+                    </span>
+
+                {% else %}
+
+                    <span class="status pending">
+                        ⏳ Pending
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="label">
+                Your Question
+            </div>
+
+            <div class="question">
+                {{ doubt[2] }}
+            </div>
+
+
+            <div class="label">
+                Admin Reply
+            </div>
+
+
+            {% if doubt[3] %}
+
+                <div class="reply-box">
+                    {{ doubt[3] }}
+                </div>
+
+            {% else %}
+
+                <div class="reply-box waiting">
+                    Your question has been submitted.
+                    Waiting for admin reply.
+                </div>
+
+            {% endif %}
+
+
+            <div class="date">
+
+                Asked:
+                {{ doubt[5] }}
+
+                {% if doubt[6] %}
+
+                    <br>
+
+                    Replied:
+                    {{ doubt[6] }}
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+
+    {% else %}
+
+        <div class="no-data">
+
+            <h3>
+                No doubts submitted yet.
+            </h3>
+
+            <p>
+                Ask your first question about a bike.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

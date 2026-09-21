@@ -1,0 +1,629 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Bike Database - BikeHub Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .database-page {
+        padding: 30px;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .page-header h1 {
+        margin: 0;
+        font-size: 30px;
+        color: #222;
+    }
+
+    .page-header p {
+        margin: 6px 0 0;
+        color: #777;
+    }
+
+    .bike-count {
+        background: #ff6b00;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+
+    .filters {
+        background: white;
+        padding: 20px;
+        border-radius: 14px;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+        margin-bottom: 25px;
+
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .search-input,
+    .brand-filter {
+        padding: 13px 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        outline: none;
+        background: white;
+    }
+
+    .search-input {
+        flex: 1;
+        min-width: 260px;
+    }
+
+    .brand-filter {
+        min-width: 180px;
+    }
+
+    .search-input:focus,
+    .brand-filter:focus {
+        border-color: #ff6b00;
+    }
+
+    .table-container {
+        background: white;
+        border-radius: 14px;
+        overflow-x: auto;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1100px;
+    }
+
+    thead {
+        background: #222;
+        color: white;
+    }
+
+    th {
+        padding: 15px 12px;
+        text-align: left;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    td {
+        padding: 14px 12px;
+        border-bottom: 1px solid #eee;
+        font-size: 13px;
+        color: #444;
+        white-space: nowrap;
+    }
+
+    tbody tr:hover {
+        background: #fff8f2;
+    }
+
+    .bike-id {
+        color: #ff6b00;
+        font-weight: bold;
+    }
+
+    .brand {
+        font-weight: 600;
+        color: #222;
+    }
+
+    .model {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .price {
+        font-weight: 600;
+        color: #198754;
+    }
+
+    .availability {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 20px;
+        background: #e8f7ed;
+        color: #198754;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .no-availability {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 20px;
+        background: #ffe8e8;
+        color: #dc3545;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #777;
+    }
+
+    .empty-state .icon {
+        font-size: 50px;
+        margin-bottom: 10px;
+    }
+
+    .no-results {
+        display: none;
+        text-align: center;
+        padding: 40px;
+        color: #777;
+        background: white;
+    }
+
+    /* Mobile */
+
+    .mobile-bikes {
+        display: none;
+    }
+
+    .bike-card {
+        background: white;
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+    }
+
+    .bike-card-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .bike-card h3 {
+        margin: 0;
+        color: #222;
+        font-size: 18px;
+    }
+
+    .bike-card .bike-brand {
+        color: #ff6b00;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .bike-id-mobile {
+        color: #777;
+        font-size: 12px;
+    }
+
+    .bike-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .info-box {
+        background: #f7f7f7;
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+    .info-box small {
+        display: block;
+        color: #888;
+        margin-bottom: 3px;
+    }
+
+    .info-box strong {
+        color: #333;
+    }
+
+    @media (max-width: 768px) {
+
+        .database-page {
+            padding: 18px;
+        }
+
+        .page-header h1 {
+            font-size: 24px;
+        }
+
+        .table-container {
+            display: none;
+        }
+
+        .mobile-bikes {
+            display: block;
+        }
+
+        .filters {
+            padding: 15px;
+        }
+
+        .search-input,
+        .brand-filter {
+            width: 100%;
+            min-width: 100%;
+            box-sizing: border-box;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="database-page">
+
+    <!-- Header -->
+
+    <div class="page-header">
+
+        <div>
+            <h1>🗄️ Bike Database</h1>
+            <p>View complete bike information stored in BikeHub</p>
+        </div>
+
+        <div class="bike-count">
+            Total Bikes: {{ bikes|length }}
+        </div>
+
+    </div>
+
+
+    <!-- Filters -->
+
+    <div class="filters">
+
+        <input
+            type="text"
+            id="bikeSearch"
+            class="search-input"
+            placeholder="🔍 Search by brand, model or CC..."
+            onkeyup="filterBikes()"
+        >
+
+        <select
+            id="brandFilter"
+            class="brand-filter"
+            onchange="filterBikes()"
+        >
+            <option value="">🏍️ All Brands</option>
+
+            {% set brands = [] %}
+
+            {% for bike in bikes %}
+
+                {% if bike[1] not in brands %}
+                    {% set ignored = brands.append(bike[1]) %}
+                    <option value="{{ bike[1]|lower }}">
+                        {{ bike[1] }}
+                    </option>
+                {% endif %}
+
+            {% endfor %}
+
+        </select>
+
+    </div>
+
+
+    <!-- Desktop Database Table -->
+
+    <div class="table-container">
+
+        {% if bikes %}
+
+        <table id="bikeTable">
+
+            <thead>
+
+                <tr>
+                    <th>ID</th>
+                    <th>Brand</th>
+                    <th>Model</th>
+                    <th>CC</th>
+                    <th>Price</th>
+                    <th>Mileage</th>
+                    <th>Power</th>
+                    <th>Torque</th>
+                    <th>Fuel Capacity</th>
+                    <th>Availability</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for bike in bikes %}
+
+                <tr>
+
+                    <td>
+                        <span class="bike-id">
+                            #{{ bike[0] }}
+                        </span>
+                    </td>
+
+                    <td>
+                        <span class="brand">
+                            {{ bike[1] }}
+                        </span>
+                    </td>
+
+                    <td>
+                        <span class="model">
+                            {{ bike[2] }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {{ bike[3] }} CC
+                    </td>
+
+                    <td>
+                        <span class="price">
+                            ₹{{ bike[4] }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {{ bike[5] }} km/l
+                    </td>
+
+                    <td>
+                        {{ bike[6] }} PS
+                    </td>
+
+                    <td>
+                        {{ bike[7] }} Nm
+                    </td>
+
+                    <td>
+                        {{ bike[8] }} L
+                    </td>
+
+                    <td>
+
+                        {% if bike[9] %}
+                            <span class="availability">
+                                ● Available
+                            </span>
+                        {% else %}
+                            <span class="no-availability">
+                                ● Not Available
+                            </span>
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        <div id="noResults" class="no-results">
+            🔍 No bikes match your search.
+        </div>
+
+        {% else %}
+
+        <div class="empty-state">
+
+            <div class="icon">🏍️</div>
+
+            <h2>No Bikes Found</h2>
+
+            <p>The bike database is currently empty.</p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- Mobile Database -->
+
+    <div class="mobile-bikes">
+
+        {% if bikes %}
+
+            {% for bike in bikes %}
+
+            <div
+                class="bike-card"
+                data-bike="{{ bike[1] }} {{ bike[2] }} {{ bike[3] }}"
+            >
+
+                <div class="bike-card-header">
+
+                    <div>
+
+                        <div class="bike-brand">
+                            {{ bike[1] }}
+                        </div>
+
+                        <h3>
+                            {{ bike[2] }}
+                        </h3>
+
+                        <div class="bike-id-mobile">
+                            Bike ID: #{{ bike[0] }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="bike-info">
+
+                    <div class="info-box">
+                        <small>Engine</small>
+                        <strong>{{ bike[3] }} CC</strong>
+                    </div>
+
+                    <div class="info-box">
+                        <small>Price</small>
+                        <strong>₹{{ bike[4] }}</strong>
+                    </div>
+
+                    <div class="info-box">
+                        <small>Mileage</small>
+                        <strong>{{ bike[5] }} km/l</strong>
+                    </div>
+
+                    <div class="info-box">
+                        <small>Power</small>
+                        <strong>{{ bike[6] }} PS</strong>
+                    </div>
+
+                    <div class="info-box">
+                        <small>Torque</small>
+                        <strong>{{ bike[7] }} Nm</strong>
+                    </div>
+
+                    <div class="info-box">
+                        <small>Fuel</small>
+                        <strong>{{ bike[8] }} L</strong>
+                    </div>
+
+                </div>
+
+
+                <br>
+
+                {% if bike[9] %}
+                    <span class="availability">
+                        ● Available
+                    </span>
+                {% else %}
+                    <span class="no-availability">
+                        ● Not Available
+                    </span>
+                {% endif %}
+
+            </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+
+function filterBikes() {
+
+    let search =
+        document.getElementById("bikeSearch")
+        .value
+        .toLowerCase();
+
+    let brand =
+        document.getElementById("brandFilter")
+        .value
+        .toLowerCase();
+
+    let rows =
+        document.querySelectorAll("#bikeTable tbody tr");
+
+    let cards =
+        document.querySelectorAll(".bike-card");
+
+    let visible = 0;
+
+
+    /* Desktop table */
+
+    rows.forEach(function(row) {
+
+        let text = row.innerText.toLowerCase();
+
+        let matchesSearch =
+            text.includes(search);
+
+        let matchesBrand =
+            brand === "" || text.includes(brand);
+
+        if (matchesSearch && matchesBrand) {
+
+            row.style.display = "";
+            visible++;
+
+        } else {
+
+            row.style.display = "none";
+
+        }
+
+    });
+
+
+    /* Mobile cards */
+
+    cards.forEach(function(card) {
+
+        let text =
+            card.innerText.toLowerCase();
+
+        let matchesSearch =
+            text.includes(search);
+
+        let matchesBrand =
+            brand === "" || text.includes(brand);
+
+        if (matchesSearch && matchesBrand) {
+
+            card.style.display = "";
+
+        } else {
+
+            card.style.display = "none";
+
+        }
+
+    });
+
+
+    /* No results message */
+
+    let noResults =
+        document.getElementById("noResults");
+
+    if (noResults) {
+
+        if (visible === 0 && rows.length > 0) {
+            noResults.style.display = "block";
+        } else {
+            noResults.style.display = "none";
+        }
+
+    }
+
+}
+
+</script>
+
+{% endblock %}

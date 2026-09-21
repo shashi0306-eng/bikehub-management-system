@@ -1,0 +1,430 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+    .cost-page {
+        width: 100%;
+    }
+
+    /* TITLE */
+
+    .title {
+        text-align: center;
+        padding: 35px 10px;
+    }
+
+    .title h1 {
+        color: #ff6a00;
+        font-size: 36px;
+        margin-bottom: 10px;
+    }
+
+    .title p {
+        color: #aaa;
+        font-size: 17px;
+    }
+
+
+    /* CALCULATOR BOX */
+
+    .calculator-box {
+        width: 90%;
+        max-width: 900px;
+        margin: 0 auto 35px auto;
+
+        background: #1c1c1c;
+
+        padding: 30px;
+
+        border-radius: 12px;
+
+        border: 1px solid #333;
+    }
+
+
+    .calculator-box h2 {
+        color: #ff6a00;
+        margin-bottom: 25px;
+    }
+
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+
+    .form-group label {
+        color: #ccc;
+        margin-bottom: 8px;
+        font-size: 15px;
+    }
+
+
+    .form-group input {
+        width: 100%;
+
+        padding: 14px;
+
+        background: #252525;
+
+        color: white;
+
+        border: 1px solid #444;
+
+        border-radius: 7px;
+
+        font-size: 15px;
+
+        outline: none;
+    }
+
+
+    .form-group input:focus {
+        border-color: #ff6a00;
+    }
+
+
+    /* BUTTON */
+
+    .calculate-button {
+        width: 100%;
+
+        margin-top: 25px;
+
+        padding: 15px;
+
+        background: #ff6a00;
+
+        color: white;
+
+        border: none;
+
+        border-radius: 7px;
+
+        font-size: 17px;
+
+        font-weight: bold;
+
+        cursor: pointer;
+
+        transition: 0.3s;
+    }
+
+
+    .calculate-button:hover {
+        background: #e65c00;
+    }
+
+
+    /* RESULT */
+
+    .result-box {
+        width: 90%;
+        max-width: 900px;
+
+        margin: 0 auto;
+
+        background: #1c1c1c;
+
+        border: 1px solid #333;
+
+        border-radius: 12px;
+
+        padding: 30px;
+
+        text-align: center;
+    }
+
+
+    .result-box h2 {
+        color: #ff6a00;
+
+        margin-bottom: 25px;
+    }
+
+
+    .result-grid {
+        display: grid;
+
+        grid-template-columns: 1fr 1fr;
+
+        gap: 20px;
+    }
+
+
+    .result-card {
+        background: #252525;
+
+        border: 1px solid #333;
+
+        border-radius: 10px;
+
+        padding: 25px;
+    }
+
+
+    .result-card span {
+        display: block;
+
+        color: #999;
+
+        font-size: 14px;
+
+        margin-bottom: 10px;
+    }
+
+
+    .result-card strong {
+        color: #ff6a00;
+
+        font-size: 28px;
+    }
+
+
+    .info {
+        width: 90%;
+        max-width: 900px;
+
+        margin: 30px auto 50px auto;
+
+        background: #181818;
+
+        border-left: 4px solid #ff6a00;
+
+        padding: 20px;
+
+        color: #aaa;
+
+        line-height: 1.6;
+    }
+
+
+    /* MOBILE */
+
+    @media(max-width: 700px) {
+
+        .title h1 {
+            font-size: 30px;
+        }
+
+        .calculator-box,
+        .result-box,
+        .info {
+            width: 94%;
+        }
+
+        .form-grid,
+        .result-grid {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+</style>
+
+
+<div class="cost-page">
+
+
+    <!-- =====================================
+         TITLE
+    ====================================== -->
+
+    <div class="title">
+
+        <h1>
+            Trip Cost Calculator
+        </h1>
+
+        <p>
+            Calculate your fuel requirement and trip cost
+        </p>
+
+    </div>
+
+
+    <!-- =====================================
+         CALCULATOR
+    ====================================== -->
+
+    <div class="calculator-box">
+
+        <h2>
+            Enter Trip Details
+        </h2>
+
+
+        <form method="POST"
+              action="{{ url_for('cost_calculator') }}">
+
+
+            <div class="form-grid">
+
+
+                <!-- DISTANCE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Distance (km)
+                    </label>
+
+                    <input
+                        type="number"
+                        name="distance"
+                        placeholder="Example: 250"
+                        min="0"
+                        step="0.1"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- MILEAGE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Bike Mileage (km/l)
+                    </label>
+
+                    <input
+                        type="number"
+                        name="mileage"
+                        placeholder="Example: 40"
+                        min="0.1"
+                        step="0.1"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- FUEL PRICE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Fuel Price (₹/litre)
+                    </label>
+
+                    <input
+                        type="number"
+                        name="fuel_price"
+                        placeholder="Example: 100"
+                        min="0"
+                        step="0.01"
+                        required
+                    >
+
+                </div>
+
+
+            </div>
+
+
+            <!-- BUTTON -->
+
+            <button
+                type="submit"
+                class="calculate-button">
+
+                ⛽ Calculate Trip Cost
+
+            </button>
+
+
+        </form>
+
+    </div>
+
+
+    <!-- =====================================
+         RESULT
+    ====================================== -->
+
+    {% if result %}
+
+    <div class="result-box">
+
+        <h2>
+            Trip Calculation Result
+        </h2>
+
+
+        <div class="result-grid">
+
+
+            <!-- FUEL USED -->
+
+            <div class="result-card">
+
+                <span>
+                    Fuel Required
+                </span>
+
+                <strong>
+                    {{ result.fuel_used }} L
+                </strong>
+
+            </div>
+
+
+            <!-- TOTAL COST -->
+
+            <div class="result-card">
+
+                <span>
+                    Total Trip Cost
+                </span>
+
+                <strong>
+                    ₹{{ result.total_cost }}
+                </strong>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- =====================================
+         INFORMATION
+    ====================================== -->
+
+    <div class="info">
+
+        <strong style="color:#ff6a00;">
+            How it works:
+        </strong>
+
+        <br>
+
+        Enter the total distance, your bike's mileage
+        and the current fuel price.
+
+        The system calculates the estimated fuel required
+        and total fuel cost for your trip.
+
+    </div>
+
+
+</div>
+
+
+{% endblock %}

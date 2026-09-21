@@ -1,0 +1,1125 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+/* =========================================================
+   MAIN PAGE
+========================================================= */
+
+.recommendation-page {
+    width: 100%;
+    min-height: 100vh;
+}
+
+
+/* =========================================================
+   PAGE TITLE
+========================================================= */
+
+.title {
+    text-align: center;
+    padding: 35px 15px 25px;
+}
+
+.title h1 {
+    color: #ff6a00;
+    font-size: 36px;
+    margin: 0 0 10px;
+}
+
+.title p {
+    color: #aaa;
+    font-size: 17px;
+    margin: 0;
+}
+
+
+/* =========================================================
+   RECOMMENDATION FORM
+========================================================= */
+
+.recommendation-box {
+    width: 90%;
+    max-width: 1100px;
+    margin: 0 auto 45px;
+
+    background: #1c1c1c;
+
+    border: 1px solid #333;
+    border-radius: 12px;
+
+    padding: 30px;
+}
+
+.recommendation-box h2 {
+    color: #ff6a00;
+    font-size: 25px;
+    margin: 0 0 25px;
+}
+
+
+/* =========================================================
+   FORM GRID
+========================================================= */
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.form-group label {
+    color: #ccc;
+    font-size: 15px;
+    margin-bottom: 8px;
+}
+
+
+.form-group input,
+.form-group select {
+
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 14px;
+
+    background: #252525;
+
+    color: white;
+
+    border: 1px solid #444;
+
+    border-radius: 7px;
+
+    font-size: 15px;
+
+    outline: none;
+}
+
+
+.form-group input:focus,
+.form-group select:focus {
+
+    border-color: #ff6a00;
+
+    box-shadow:
+        0 0 0 2px rgba(255, 106, 0, 0.10);
+}
+
+
+/* =========================================================
+   RECOMMEND BUTTON
+========================================================= */
+
+.recommend-button {
+
+    width: 100%;
+
+    margin-top: 25px;
+
+    padding: 15px;
+
+    background: #ff6a00;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 7px;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+
+.recommend-button:hover {
+
+    background: #e65c00;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 5px 20px rgba(255, 106, 0, 0.25);
+}
+
+
+/* =========================================================
+   RESULTS SECTION
+========================================================= */
+
+.results {
+
+    width: 90%;
+    max-width: 1450px;
+
+    margin: 0 auto;
+
+    padding-bottom: 70px;
+}
+
+
+.results-title {
+
+    text-align: center;
+
+    color: #ff6a00;
+
+    font-size: 30px;
+
+    font-weight: bold;
+
+    margin-bottom: 35px;
+}
+
+
+/* =========================================================
+   BIKE GRID
+========================================================= */
+
+.bike-container {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(300px, 1fr)
+        );
+
+    gap: 28px;
+}
+
+
+/* =========================================================
+   BIKE CARD
+========================================================= */
+
+.bike-card {
+
+    background: #1c1c1c;
+
+    border: 1px solid #333;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    transition:
+        transform 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+
+.bike-card:hover {
+
+    transform: translateY(-6px);
+
+    border-color: #ff6a00;
+
+    box-shadow:
+        0 10px 30px
+        rgba(255, 106, 0, 0.20);
+}
+
+
+/* =========================================================
+   IMAGE BOX
+========================================================= */
+
+.bike-image {
+
+    width: 100%;
+
+    height: 250px;
+
+    background: #080808;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    overflow: hidden;
+
+    position: relative;
+}
+
+
+/* =========================================================
+   BIKE IMAGE
+
+   IMPORTANT:
+   Image comes from:
+   /bike_recommendation_image/<bike_id>
+
+   It does NOT use bike[10] or bike[11].
+========================================================= */
+
+.bike-image img {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: contain;
+
+    object-position: center;
+
+    display: block;
+
+    background: #080808;
+
+    transition:
+        transform 0.3s ease;
+}
+
+
+.bike-card:hover .bike-image img {
+
+    transform: scale(1.04);
+}
+
+
+/* =========================================================
+   IMAGE ERROR
+========================================================= */
+
+.image-error {
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    color: #777;
+
+    font-size: 14px;
+
+    text-align: center;
+
+    background: #080808;
+}
+
+
+/* =========================================================
+   BIKE INFORMATION
+========================================================= */
+
+.bike-info {
+
+    padding: 20px;
+}
+
+
+.brand {
+
+    color: #ff6a00;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.5px;
+
+    margin-bottom: 5px;
+}
+
+
+.model {
+
+    color: white;
+
+    font-size: 23px;
+
+    font-weight: bold;
+
+    margin-bottom: 18px;
+
+    line-height: 1.2;
+}
+
+
+/* =========================================================
+   SPECIFICATIONS
+========================================================= */
+
+.specs {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 10px;
+
+    margin-bottom: 18px;
+}
+
+
+.spec {
+
+    background: #252525;
+
+    padding: 11px;
+
+    border-radius: 6px;
+
+    min-height: 58px;
+
+    box-sizing: border-box;
+}
+
+
+.spec span {
+
+    display: block;
+
+    color: #999;
+
+    font-size: 12px;
+
+    margin-bottom: 5px;
+}
+
+
+.spec strong {
+
+    color: white;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   PRICE
+========================================================= */
+
+.price {
+
+    color: #ff6a00;
+
+    font-size: 22px;
+
+    font-weight: bold;
+
+    margin-bottom: 10px;
+}
+
+
+/* =========================================================
+   AVAILABILITY
+========================================================= */
+
+.available {
+
+    color: #4caf50;
+
+    font-weight: bold;
+
+    margin-bottom: 15px;
+}
+
+
+.not-available {
+
+    color: #f44336;
+
+    font-weight: bold;
+
+    margin-bottom: 15px;
+}
+
+
+/* =========================================================
+   DETAILS BUTTON
+========================================================= */
+
+.details-btn {
+
+    display: block;
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    text-align: center;
+
+    text-decoration: none;
+
+    color: white;
+
+    background: #ff6a00;
+
+    padding: 11px;
+
+    border-radius: 6px;
+
+    font-weight: bold;
+
+    transition: 0.3s;
+}
+
+
+.details-btn:hover {
+
+    background: #e65c00;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   NO RESULTS
+========================================================= */
+
+.no-results {
+
+    width: 90%;
+
+    max-width: 900px;
+
+    margin: 30px auto 60px;
+
+    text-align: center;
+
+    color: #aaa;
+
+    font-size: 18px;
+
+    line-height: 1.6;
+
+    padding: 40px;
+
+    background: #1c1c1c;
+
+    border: 1px solid #333;
+
+    border-radius: 12px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .title {
+        padding-top: 25px;
+    }
+
+
+    .title h1 {
+        font-size: 29px;
+    }
+
+
+    .title p {
+        font-size: 15px;
+    }
+
+
+    .recommendation-box {
+
+        width: 94%;
+
+        padding: 20px;
+
+        box-sizing: border-box;
+    }
+
+
+    .form-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+
+    .results {
+
+        width: 94%;
+    }
+
+
+    .bike-container {
+
+        grid-template-columns: 1fr;
+    }
+
+
+    .bike-image {
+
+        height: 230px;
+    }
+
+}
+
+
+/* =========================================================
+   VERY SMALL SCREEN
+========================================================= */
+
+@media (max-width: 400px) {
+
+    .recommendation-box {
+
+        padding: 15px;
+    }
+
+
+    .bike-info {
+
+        padding: 15px;
+    }
+
+
+    .model {
+
+        font-size: 20px;
+    }
+
+
+    .bike-image {
+
+        height: 210px;
+    }
+
+}
+
+</style>
+
+
+<div class="recommendation-page">
+
+
+    <!-- =====================================================
+         PAGE TITLE
+    ====================================================== -->
+
+    <div class="title">
+
+        <h1>
+            Smart Bike Recommendation
+        </h1>
+
+        <p>
+            Find bikes according to your budget,
+            engine preference and riding requirements
+        </p>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         RECOMMENDATION FORM
+    ====================================================== -->
+
+    <div class="recommendation-box">
+
+        <h2>
+            Enter Your Requirements
+        </h2>
+
+
+        <form
+            method="POST"
+            action="{{ url_for('recommendation') }}"
+        >
+
+
+            <div class="form-grid">
+
+
+                <!-- =================================================
+                     BUDGET
+                ================================================== -->
+
+                <div class="form-group">
+
+                    <label for="budget">
+                        Maximum Budget (₹)
+                    </label>
+
+
+                    <input
+                        type="number"
+                        id="budget"
+                        name="budget"
+                        placeholder="Example: 200000"
+                        min="0"
+                        required
+                    >
+
+                </div>
+
+
+
+                <!-- =================================================
+                     ENGINE CC
+                ================================================== -->
+
+                <div class="form-group">
+
+                    <label for="cc_range">
+                        Preferred Engine CC
+                    </label>
+
+
+                    <select
+                        id="cc_range"
+                        name="cc_range"
+                    >
+
+                        <option value="">
+                            Any CC
+                        </option>
+
+
+                        <option value="100-125">
+                            100 - 125 CC
+                        </option>
+
+
+                        <option value="126-160">
+                            126 - 160 CC
+                        </option>
+
+
+                        <option value="161-200">
+                            161 - 200 CC
+                        </option>
+
+
+                        <option value="201-250">
+                            201 - 250 CC
+                        </option>
+
+
+                        <option value="251+">
+                            251 CC and Above
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     MILEAGE
+                ================================================== -->
+
+                <div class="form-group">
+
+                    <label for="mileage">
+                        Minimum Mileage (km/l)
+                    </label>
+
+
+                    <input
+                        type="number"
+                        id="mileage"
+                        name="mileage"
+                        placeholder="Example: 40"
+                        min="0"
+                        step="0.1"
+                    >
+
+                </div>
+
+
+
+                <!-- =================================================
+                     USAGE
+                ================================================== -->
+
+                <div class="form-group">
+
+                    <label for="usage">
+                        Usage Type
+                    </label>
+
+
+                    <select
+                        id="usage"
+                        name="usage"
+                    >
+
+                        <option value="">
+                            Select Usage
+                        </option>
+
+
+                        <option value="daily">
+                            Daily Use
+                        </option>
+
+
+                        <option value="city">
+                            City Riding
+                        </option>
+
+
+                        <option value="commute">
+                            Office / College Commute
+                        </option>
+
+
+                        <option value="highway">
+                            Highway Riding
+                        </option>
+
+
+                        <option value="tour">
+                            Touring
+                        </option>
+
+
+                        <option value="sport">
+                            Sport / Performance
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =====================================================
+                 SUBMIT BUTTON
+            ====================================================== -->
+
+            <button
+                type="submit"
+                class="recommend-button"
+            >
+
+                🏍️ Find Recommended Bikes
+
+            </button>
+
+
+        </form>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         RESULTS
+    ====================================================== -->
+
+    {% if recommendations %}
+
+
+    <div class="results">
+
+
+        <div class="results-title">
+
+            🏍️ Recommended Bikes
+
+        </div>
+
+
+
+        <div class="bike-container">
+
+
+            {% for bike in recommendations %}
+
+
+            <div class="bike-card">
+
+
+                <!-- =================================================
+                     BIKE IMAGE
+                     
+                     IMPORTANT:
+                     Directly use bike ID.
+                     
+                     Example:
+                     bike id 145
+                     ↓
+                     /bike_recommendation_image/145
+                     ↓
+                     images/145_Bajaj_Platina_100/
+                     ↓
+                     145_Bajaj_Platina_100_1.jpg
+                ================================================== -->
+
+                <div class="bike-image">
+
+
+                    <img
+                        src="{{ url_for(
+                            'bike_recommendation_image',
+                            bike_id=bike[0]
+                        ) }}"
+                        alt="{{ bike[1] }} {{ bike[2] }}"
+                        loading="lazy"
+
+                        onerror="
+                            this.style.display='none';
+                            this.parentElement.querySelector('.image-error').style.display='flex';
+                        "
+                    >
+
+
+                    <div
+                        class="image-error"
+                        style="display:none;"
+                    >
+
+                        Image unavailable
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     BIKE INFORMATION
+                ================================================== -->
+
+                <div class="bike-info">
+
+
+                    <!-- BRAND -->
+
+                    <div class="brand">
+
+                        {{ bike[1] }}
+
+                    </div>
+
+
+
+                    <!-- MODEL -->
+
+                    <div class="model">
+
+                        {{ bike[2] }}
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         SPECIFICATIONS
+                    ================================================== -->
+
+                    <div class="specs">
+
+
+                        <!-- CC -->
+
+                        <div class="spec">
+
+                            <span>
+                                Engine
+                            </span>
+
+                            <strong>
+                                {{ bike[3] }} CC
+                            </strong>
+
+                        </div>
+
+
+
+                        <!-- MILEAGE -->
+
+                        <div class="spec">
+
+                            <span>
+                                Mileage
+                            </span>
+
+                            <strong>
+                                {{ bike[5] }} km/l
+                            </strong>
+
+                        </div>
+
+
+
+                        <!-- POWER -->
+
+                        <div class="spec">
+
+                            <span>
+                                Power
+                            </span>
+
+                            <strong>
+                                {{ bike[6] }}
+                            </strong>
+
+                        </div>
+
+
+
+                        <!-- TORQUE -->
+
+                        <div class="spec">
+
+                            <span>
+                                Torque
+                            </span>
+
+                            <strong>
+                                {{ bike[7] }}
+                            </strong>
+
+                        </div>
+
+
+
+                        <!-- FUEL -->
+
+                        <div class="spec">
+
+                            <span>
+                                Fuel Capacity
+                            </span>
+
+                            <strong>
+                                {{ bike[8] }} L
+                            </strong>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         PRICE
+                    ================================================== -->
+
+                    <div class="price">
+
+                        ₹{{ "{:,.0f}".format(bike[4]) }}
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         AVAILABILITY
+                    ================================================== -->
+
+                    {% if bike[9] == "Available" %}
+
+
+                        <div class="available">
+
+                            ✓ Available
+
+                        </div>
+
+
+                    {% else %}
+
+
+                        <div class="not-available">
+
+                            ✕ Not Available
+
+                        </div>
+
+
+                    {% endif %}
+
+
+
+                    <!-- =================================================
+                         VIEW DETAILS
+                    ================================================== -->
+
+                    <a
+                        href="{{ url_for(
+                            'bike_details',
+                            bike_id=bike[0]
+                        ) }}"
+                        class="details-btn"
+                    >
+
+                        View Details
+
+                    </a>
+
+
+                </div>
+
+
+            </div>
+
+
+            {% endfor %}
+
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- =====================================================
+         NO RESULTS
+    ====================================================== -->
+
+    {% elif request.method == "POST" %}
+
+
+    <div class="no-results">
+
+        ❌ No bikes found matching your requirements.
+
+        <br>
+        <br>
+
+        Try increasing your budget,
+        selecting another CC range,
+        or reducing the minimum mileage requirement.
+
+    </div>
+
+
+    {% endif %}
+
+
+</div>
+
+
+{% endblock %}

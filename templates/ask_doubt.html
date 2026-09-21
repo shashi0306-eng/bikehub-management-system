@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+.support-container {
+    max-width: 850px;
+    margin: 50px auto;
+    padding: 20px;
+}
+
+.support-title {
+    text-align: center;
+    color: #ff6600;
+    margin-bottom: 10px;
+    font-size: 34px;
+}
+
+.support-subtitle {
+    text-align: center;
+    color: #bbbbbb;
+    margin-bottom: 35px;
+}
+
+.support-card {
+    background: #1c1c1c;
+    border: 1px solid #333333;
+    border-radius: 12px;
+    padding: 35px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    box-sizing: border-box;
+    background: #111111;
+    color: white;
+    border: 1px solid #444444;
+    border-radius: 7px;
+    padding: 14px;
+    font-size: 16px;
+}
+
+.form-group textarea {
+    height: 180px;
+    resize: vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #ff6600;
+}
+
+.submit-btn {
+    width: 100%;
+    background: #ff6600;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.submit-btn:hover {
+    background: #e65c00;
+}
+
+.my-doubts-btn {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    background: #333333;
+    color: white;
+    text-decoration: none;
+    border-radius: 7px;
+    padding: 13px;
+}
+
+.my-doubts-btn:hover {
+    background: #444444;
+}
+
+.error-message {
+    background: #4d1717;
+    color: #ffb3b3;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.example-box {
+    background: #111111;
+    border-left: 4px solid #ff6600;
+    padding: 15px;
+    margin-bottom: 25px;
+    color: #bbbbbb;
+    line-height: 1.6;
+}
+
+</style>
+
+
+<div class="support-container">
+
+    <h1 class="support-title">
+        💬 Ask Your Doubt
+    </h1>
+
+    <p class="support-subtitle">
+        Have a question about a bike?
+        Send your doubt to our support team.
+    </p>
+
+
+    <div class="support-card">
+
+        {% if error %}
+
+        <div class="error-message">
+            {{ error }}
+        </div>
+
+        {% endif %}
+
+
+        <div class="example-box">
+
+            You can ask about bike price,
+            mileage, CC, performance,
+            specifications, maintenance,
+            availability, test rides
+            and other bike-related doubts.
+
+        </div>
+
+
+        <form
+            method="POST"
+            action="{{ url_for('ask_doubt') }}"
+        >
+
+            <div class="form-group">
+
+                <label>
+                    Subject
+                </label>
+
+                <input
+                    type="text"
+                    name="subject"
+                    maxlength="150"
+                    placeholder="Example: KTM 200 Duke mileage"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Your Question
+                </label>
+
+                <textarea
+                    name="question"
+                    placeholder="Type your question here..."
+                    required
+                ></textarea>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="submit-btn"
+            >
+                Submit Doubt
+            </button>
+
+        </form>
+
+
+        <a
+            href="{{ url_for('my_doubts') }}"
+            class="my-doubts-btn"
+        >
+            View My Doubts & Replies
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,349 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+.test-rides-page {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.page-title {
+    text-align: center;
+    color: #ff6600;
+    font-size: 34px;
+    margin-bottom: 10px;
+}
+
+.page-subtitle {
+    text-align: center;
+    color: #aaa;
+    margin-bottom: 35px;
+}
+
+.booking-card {
+    background: #1c1c1c;
+    border: 1px solid #333;
+    border-radius: 14px;
+    padding: 25px;
+    margin-bottom: 25px;
+    transition: 0.25s;
+}
+
+.booking-card:hover {
+    border-color: #ff6600;
+    transform: translateY(-3px);
+}
+
+.booking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.bike-name {
+    color: #ff6600;
+    font-size: 23px;
+    font-weight: bold;
+}
+
+.status {
+    padding: 7px 15px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.pending {
+    background: #5c4700;
+    color: #ffd966;
+}
+
+.confirmed {
+    background: #174d2b;
+    color: #7dffa5;
+}
+
+.completed {
+    background: #174d4d;
+    color: #7de8ff;
+}
+
+.cancelled {
+    background: #4d1717;
+    color: #ff8585;
+}
+
+.details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px 30px;
+}
+
+.detail {
+    background: #252525;
+    padding: 14px;
+    border-radius: 7px;
+}
+
+.label {
+    color: #888;
+    font-size: 13px;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.value {
+    color: white;
+    font-size: 15px;
+}
+
+.booking-id {
+    color: #777;
+    font-size: 13px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #333;
+}
+
+.no-bookings {
+    background: #1c1c1c;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 55px 20px;
+    text-align: center;
+    color: #aaa;
+}
+
+.no-bookings h3 {
+    color: #ff6600;
+    margin-bottom: 10px;
+}
+
+.back-button {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 11px 20px;
+    background: #ff6600;
+    color: white;
+    text-decoration: none;
+    border-radius: 7px;
+    font-weight: bold;
+}
+
+.back-button:hover {
+    background: #e65c00;
+}
+
+@media (max-width: 700px) {
+
+    .test-rides-page {
+        padding: 15px;
+        margin: 20px auto;
+    }
+
+    .booking-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .details {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+</style>
+
+
+<div class="test-rides-page">
+
+    <h1 class="page-title">
+        🏍️ My Test Rides
+    </h1>
+
+    <p class="page-subtitle">
+        View and track your test ride bookings.
+    </p>
+
+
+    {% if bookings %}
+
+        {% for booking in bookings %}
+
+        <div class="booking-card">
+
+
+            <!-- BIKE NAME + STATUS -->
+
+            <div class="booking-header">
+
+                <div class="bike-name">
+                    🏍️ {{ booking[1] }} {{ booking[2] }}
+                </div>
+
+
+                {% if booking[9] == "Confirmed" %}
+
+                    <span class="status confirmed">
+                        ✓ Confirmed
+                    </span>
+
+                {% elif booking[9] == "Completed" %}
+
+                    <span class="status completed">
+                        ✓ Completed
+                    </span>
+
+                {% elif booking[9] == "Cancelled" %}
+
+                    <span class="status cancelled">
+                        ✕ Cancelled
+                    </span>
+
+                {% else %}
+
+                    <span class="status pending">
+                        ⏳ Pending
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- BOOKING DETAILS -->
+
+            <div class="details">
+
+
+                <div class="detail">
+
+                    <span class="label">
+                        Customer Name
+                    </span>
+
+                    <span class="value">
+                        {{ booking[3] }}
+                    </span>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <span class="label">
+                        Mobile
+                    </span>
+
+                    <span class="value">
+                        {{ booking[4] }}
+                    </span>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <span class="label">
+                        Email
+                    </span>
+
+                    <span class="value">
+                        {{ booking[5] }}
+                    </span>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <span class="label">
+                        Test Ride Date
+                    </span>
+
+                    <span class="value">
+                        📅 {{ booking[6] }}
+                    </span>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <span class="label">
+                        Test Ride Time
+                    </span>
+
+                    <span class="value">
+                        🕐 {{ booking[7] }}
+                    </span>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <span class="label">
+                        Location
+                    </span>
+
+                    <span class="value">
+                        📍 {{ booking[8] }}
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- BOOKING ID -->
+
+            <div class="booking-id">
+
+                Test Ride Booking ID:
+                #{{ booking[0] }}
+
+            </div>
+
+
+        </div>
+
+        {% endfor %}
+
+
+    {% else %}
+
+
+        <div class="no-bookings">
+
+            <h3>
+                📭 No Test Ride Bookings
+            </h3>
+
+            <p>
+                You have not booked any test rides yet.
+            </p>
+
+
+            <a
+                href="{{ url_for('bikes') }}"
+                class="back-button"
+            >
+                🏍️ Browse Bikes
+            </a>
+
+        </div>
+
+
+    {% endif %}
+
+
+</div>
+
+{% endblock %}

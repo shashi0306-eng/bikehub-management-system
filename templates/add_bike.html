@@ -1,0 +1,249 @@
+{% extends "admin_base.html" %}
+
+{% block title %}
+Add Bike - BikeHub
+{% endblock %}
+
+
+{% block content %}
+
+<div class="page-header">
+
+    <h1>➕ Add New Bike</h1>
+
+    <p>
+        Add a motorcycle to the BikeHub database
+    </p>
+
+</div>
+
+
+<div class="form-container">
+
+<form
+    method="POST"
+    action="{{ url_for('add_bike') }}"
+>
+
+
+    <div class="form-grid">
+
+
+        <div class="form-group">
+
+            <label>
+                Brand
+            </label>
+
+            <input
+                type="text"
+                name="brand"
+                placeholder="Example: KTM"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Model
+            </label>
+
+            <input
+                type="text"
+                name="model"
+                placeholder="Example: Duke 390"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Engine CC
+            </label>
+
+            <input
+                type="number"
+                name="cc"
+                placeholder="Example: 399"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Price
+            </label>
+
+            <input
+                type="number"
+                step="0.01"
+                name="price"
+                placeholder="Example: 300000"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Mileage (km/l)
+            </label>
+
+            <input
+                type="number"
+                step="0.01"
+                name="mileage"
+                placeholder="Example: 35"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Power (PS)
+            </label>
+
+            <input
+                type="text"
+                name="power"
+                placeholder="Example: 45"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Torque (Nm)
+            </label>
+
+            <input
+                type="text"
+                name="torque"
+                placeholder="Example: 39"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Fuel Capacity (L)
+            </label>
+
+            <input
+                type="number"
+                step="0.01"
+                name="fuel_capacity"
+                placeholder="Example: 13.4"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Availability
+            </label>
+
+            <select
+                name="availability"
+                required
+            >
+
+                <option value="">
+                    Select Availability
+                </option>
+
+                <option value="Available">
+                    Available
+                </option>
+
+                <option value="Not Available">
+                    Not Available
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Vehicle Type
+            </label>
+
+            <select
+                name="vehicle_type"
+                required
+            >
+
+                <option value="">
+                    Select Type
+                </option>
+
+                <option value="Motorcycle">
+                    Motorcycle
+                </option>
+
+                <option value="Scooter">
+                    Scooter
+                </option>
+
+            </select>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="form-actions">
+
+        <button
+            type="submit"
+            class="orange-btn"
+        >
+            ➕ Add Bike
+        </button>
+
+
+        <a
+            href="{{ url_for('admin_bikes') }}"
+            class="orange-btn"
+            style="
+                background:#333;
+            "
+        >
+            ← Cancel
+        </a>
+
+    </div>
+
+
+</form>
+
+</div>
+
+{% endblock %}

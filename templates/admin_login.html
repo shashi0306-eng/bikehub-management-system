@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Admin Login - BikeHub</title>
+
+
+    <style>
+
+        * {
+            box-sizing:border-box;
+            margin:0;
+            padding:0;
+        }
+
+        body {
+
+            min-height:100vh;
+
+            display:flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+            background:#0d0d0d;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            color:white;
+
+            padding:20px;
+        }
+
+
+        .login-box {
+
+            width:100%;
+
+            max-width:430px;
+
+            background:#181818;
+
+            border:1px solid #303030;
+
+            border-radius:22px;
+
+            padding:35px;
+
+            box-shadow:
+                0 20px 60px
+                rgba(0,0,0,.4);
+        }
+
+
+        .logo {
+
+            text-align:center;
+
+            font-size:45px;
+
+            margin-bottom:10px;
+        }
+
+
+        h1 {
+
+            text-align:center;
+
+            color:#ff6600;
+
+            font-size:30px;
+
+            margin-bottom:7px;
+        }
+
+
+        .subtitle {
+
+            text-align:center;
+
+            color:#777;
+
+            margin-bottom:30px;
+
+            font-size:14px;
+        }
+
+
+        label {
+
+            display:block;
+
+            color:#aaa;
+
+            font-size:13px;
+
+            font-weight:bold;
+
+            margin-bottom:7px;
+        }
+
+
+        input {
+
+            width:100%;
+
+            padding:13px;
+
+            background:#242424;
+
+            color:white;
+
+            border:1px solid #3b3b3b;
+
+            border-radius:9px;
+
+            margin-bottom:18px;
+
+            outline:none;
+        }
+
+
+        input:focus {
+
+            border-color:#ff6600;
+        }
+
+
+        button {
+
+            width:100%;
+
+            padding:13px;
+
+            border:none;
+
+            border-radius:9px;
+
+            background:#ff6600;
+
+            color:white;
+
+            font-weight:800;
+
+            font-size:15px;
+
+            cursor:pointer;
+        }
+
+
+        button:hover {
+
+            background:#ff7a1a;
+        }
+
+
+        .back {
+
+            display:block;
+
+            text-align:center;
+
+            margin-top:20px;
+
+            color:#888;
+
+            text-decoration:none;
+
+            font-size:13px;
+        }
+
+
+        .back:hover {
+
+            color:#ff6600;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="login-box">
+
+
+    <div class="logo">
+        🏍️
+    </div>
+
+
+    <h1>
+        BikeHub Admin
+    </h1>
+
+
+    <p class="subtitle">
+        Administrator Login
+    </p>
+
+
+    <form
+        method="POST"
+        action="{{ url_for('admin_login') }}"
+    >
+
+
+        <label>
+            Username
+        </label>
+
+        <input
+            type="text"
+            name="username"
+            placeholder="Enter admin username"
+            required
+        >
+
+
+        <label>
+            Password
+        </label>
+
+        <input
+            type="password"
+            name="password"
+            placeholder="Enter admin password"
+            required
+        >
+
+
+        <button type="submit">
+            🔐 Login to Admin Panel
+        </button>
+
+
+    </form>
+
+
+    <a
+        href="{{ url_for('home') }}"
+        class="back"
+    >
+        ← Back to BikeHub
+    </a>
+
+
+</div>
+
+
+</body>
+
+</html>

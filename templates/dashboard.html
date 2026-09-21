@@ -1,0 +1,1358 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - BikeHub{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+.dashboard {
+    max-width: 1400px;
+    margin: auto;
+    padding: 30px 20px 60px;
+}
+
+
+/* =========================================================
+   WELCOME HERO
+   NO BUTTONS HERE
+========================================================= */
+
+.hero {
+    position: relative;
+    overflow: hidden;
+
+    min-height: 250px;
+
+    border-radius: 24px;
+
+    padding: 50px;
+
+    background:
+        radial-gradient(
+            circle at 90% 20%,
+            rgba(255,102,0,.20),
+            transparent 30%
+        ),
+        linear-gradient(
+            135deg,
+            #181818,
+            #101010
+        );
+
+    border: 1px solid #333;
+
+    box-shadow:
+        0 15px 40px rgba(0,0,0,.35);
+}
+
+
+.hero::before {
+    content: "";
+
+    position: absolute;
+
+    width: 300px;
+    height: 300px;
+
+    right: -100px;
+    bottom: -170px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255,102,0,.08);
+}
+
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+
+.hero h1 {
+    margin: 0;
+
+    font-size: 46px;
+
+    font-weight: 800;
+
+    color: #ff6600;
+
+    letter-spacing: -1px;
+}
+
+
+.hero h1 span {
+    color: white;
+}
+
+
+.hero p {
+    color: #bdbdbd;
+
+    font-size: 18px;
+
+    margin-top: 12px;
+
+    max-width: 700px;
+}
+
+
+/* =========================================================
+   SECTION
+========================================================= */
+
+.section {
+    margin-top: 42px;
+}
+
+
+.section-title {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 20px;
+}
+
+
+.section-title h2 {
+    margin: 0;
+
+    color: white;
+
+    font-size: 25px;
+}
+
+
+.section-line {
+    height: 1px;
+
+    flex: 1;
+
+    background:
+        linear-gradient(
+            to right,
+            #444,
+            transparent
+        );
+}
+
+
+/* =========================================================
+   SERVICE GRID
+========================================================= */
+
+.service-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 20px;
+}
+
+
+/* =========================================================
+   SERVICE CARD
+========================================================= */
+
+.service-card {
+
+    position: relative;
+
+    overflow: hidden;
+
+    min-height: 205px;
+
+    padding: 28px;
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #1d1d1d,
+            #151515
+        );
+
+    border: 1px solid #303030;
+
+    transition:
+        all .3s ease;
+}
+
+
+.service-card::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 100px;
+    height: 100px;
+
+    right: -50px;
+    bottom: -50px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255,102,0,.06);
+
+    transition: .3s;
+}
+
+
+.service-card:hover {
+
+    transform:
+        translateY(-7px);
+
+    border-color:
+        #ff6600;
+
+    box-shadow:
+        0 15px 35px
+        rgba(0,0,0,.4);
+}
+
+
+.service-card:hover::after {
+
+    transform:
+        scale(2);
+}
+
+
+/* =========================================================
+   CARD LINK
+========================================================= */
+
+.card-link {
+
+    display: block;
+
+    height: 100%;
+
+    color: white;
+
+    text-decoration: none;
+}
+
+
+/* =========================================================
+   ICON
+========================================================= */
+
+.icon-box {
+
+    width: 58px;
+    height: 58px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 15px;
+
+    background:
+        rgba(255,102,0,.10);
+
+    border:
+        1px solid
+        rgba(255,102,0,.25);
+
+    font-size: 30px;
+
+    margin-bottom: 18px;
+}
+
+
+/* =========================================================
+   CARD TITLE
+========================================================= */
+
+.service-card h3 {
+
+    margin:
+        0 0 9px;
+
+    font-size: 20px;
+
+    color:
+        #ff6600;
+}
+
+
+.service-card p {
+
+    margin: 0;
+
+    color:
+        #aaa;
+
+    line-height: 1.6;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   ARROW
+========================================================= */
+
+.arrow {
+
+    position: absolute;
+
+    right: 22px;
+
+    top: 25px;
+
+    color:
+        #666;
+
+    font-size: 20px;
+
+    transition: .25s;
+}
+
+
+.service-card:hover .arrow {
+
+    color:
+        #ff6600;
+
+    transform:
+        translateX(5px);
+}
+
+
+/* =========================================================
+   FEATURED GRID
+========================================================= */
+
+.featured-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 20px;
+}
+
+
+/* =========================================================
+   FEATURED CARD
+========================================================= */
+
+.featured-card {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 22px;
+
+    padding: 25px;
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #1d1d1d,
+            #141414
+        );
+
+    border:
+        1px solid #303030;
+
+    transition: .3s;
+}
+
+
+.featured-card:hover {
+
+    border-color:
+        #ff6600;
+
+    transform:
+        translateY(-4px);
+}
+
+
+/* =========================================================
+   FEATURED ICON
+========================================================= */
+
+.featured-icon {
+
+    min-width: 65px;
+
+    height: 65px;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    border-radius: 17px;
+
+    background:
+        #222;
+
+    font-size: 32px;
+}
+
+
+/* =========================================================
+   FEATURED INFO
+========================================================= */
+
+.featured-info h3 {
+
+    margin:
+        0 0 7px;
+
+    color:
+        #ff6600;
+}
+
+
+.featured-info p {
+
+    margin: 0;
+
+    color:
+        #aaa;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   SUPPORT
+========================================================= */
+
+.support-card {
+
+    border-color:
+        #3b3029;
+}
+
+
+.support-card:hover {
+
+    border-color:
+        #ff6600;
+}
+
+
+/* =========================================================
+   BUTTON
+========================================================= */
+
+.banner-btn {
+
+    display: inline-block;
+
+    padding:
+        13px 22px;
+
+    background:
+        #ff6600;
+
+    color:
+        white;
+
+    text-decoration:
+        none;
+
+    border-radius:
+        8px;
+
+    font-weight:
+        bold;
+}
+
+
+.banner-btn:hover {
+
+    background:
+        #ff7a22;
+}
+
+
+/* =========================================================
+   QUICK STATS
+========================================================= */
+
+.stats {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 18px;
+}
+
+
+.stat {
+
+    padding: 23px;
+
+    text-align:
+        center;
+
+    border-radius:
+        16px;
+
+    background:
+        #181818;
+
+    border:
+        1px solid #303030;
+}
+
+
+.stat-icon {
+
+    font-size:
+        28px;
+
+    margin-bottom:
+        8px;
+}
+
+
+.stat h3 {
+
+    margin: 0;
+
+    color:
+        white;
+
+    font-size:
+        18px;
+}
+
+
+.stat p {
+
+    margin:
+        6px 0 0;
+
+    color:
+        #888;
+
+    font-size:
+        13px;
+}
+
+
+/* =========================================================
+   BOTTOM BANNER
+========================================================= */
+
+.bottom-banner {
+
+    margin-top:
+        42px;
+
+    padding:
+        30px;
+
+    border-radius:
+        20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,102,0,.13),
+            rgba(255,102,0,.03)
+        );
+
+    border:
+        1px solid
+        rgba(255,102,0,.25);
+
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        center;
+
+    gap:
+        20px;
+}
+
+
+.bottom-banner h2 {
+
+    margin:
+        0 0 7px;
+
+    color:
+        #ff6600;
+}
+
+
+.bottom-banner p {
+
+    margin: 0;
+
+    color:
+        #aaa;
+}
+
+
+/* =========================================================
+   ANIMATION
+========================================================= */
+
+@keyframes fadeUp {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            translateY(15px);
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0);
+    }
+
+}
+
+
+.hero,
+.service-card,
+.featured-card,
+.stat {
+
+    animation:
+        fadeUp .5s ease both;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1000px) {
+
+    .service-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+
+    .stats {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .dashboard {
+
+        padding:
+            20px 12px 40px;
+    }
+
+
+    .hero {
+
+        padding:
+            30px 25px;
+    }
+
+
+    .hero h1 {
+
+        font-size:
+            34px;
+    }
+
+
+    .hero p {
+
+        font-size:
+            16px;
+    }
+
+
+    .service-grid,
+    .featured-grid,
+    .stats {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .bottom-banner {
+
+        flex-direction:
+            column;
+
+        align-items:
+            flex-start;
+    }
+
+}
+
+</style>
+
+
+<div class="dashboard">
+
+
+    <!-- =====================================================
+         WELCOME SECTION
+         ONLY WELCOME TEXT
+         NO NAVIGATION BUTTONS HERE
+    ====================================================== -->
+
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <h1>
+
+                Welcome,
+
+                <span>
+                    {{ user_name }}
+                </span>
+
+                👋
+
+            </h1>
+
+
+            <p>
+
+                Find, compare and choose the right bike
+                according to your needs.
+
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         BIKE SERVICES
+    ====================================================== -->
+
+    <section class="section">
+
+
+        <div class="section-title">
+
+            <h2>
+                🏍️ Bike Services
+            </h2>
+
+            <div class="section-line"></div>
+
+        </div>
+
+
+        <div class="service-grid">
+
+
+            <!-- =================================================
+                 BROWSE BIKES
+            ================================================== -->
+
+            <div class="service-card">
+
+                <a
+                    href="{{ url_for('bikes') }}"
+                    class="card-link"
+                >
+
+                    <span class="arrow">
+                        →
+                    </span>
+
+
+                    <div class="icon-box">
+                        🏍️
+                    </div>
+
+
+                    <h3>
+                        Browse Bikes
+                    </h3>
+
+
+                    <p>
+
+                        View all available bikes,
+                        specifications and details.
+
+                    </p>
+
+                </a>
+
+            </div>
+
+
+            <!-- =================================================
+                 SEARCH
+            ================================================== -->
+
+            <div class="service-card">
+
+                <a
+                    href="{{ url_for('search') }}"
+                    class="card-link"
+                >
+
+                    <span class="arrow">
+                        →
+                    </span>
+
+
+                    <div class="icon-box">
+                        🔎
+                    </div>
+
+
+                    <h3>
+                        Search & Filter
+                    </h3>
+
+
+                    <p>
+
+                        Search bikes using brand,
+                        CC, price and mileage.
+
+                    </p>
+
+                </a>
+
+            </div>
+
+
+            <!-- =================================================
+                 COMPARE
+            ================================================== -->
+
+            <div class="service-card">
+
+                <a
+                    href="{{ url_for('compare') }}"
+                    class="card-link"
+                >
+
+                    <span class="arrow">
+                        →
+                    </span>
+
+
+                    <div class="icon-box">
+                        ⚖️
+                    </div>
+
+
+                    <h3>
+                        Compare Bikes
+                    </h3>
+
+
+                    <p>
+
+                        Compare different bikes
+                        and their specifications.
+
+                    </p>
+
+                </a>
+
+            </div>
+
+
+            <!-- =================================================
+                 RECOMMENDATION
+            ================================================== -->
+
+            <div class="service-card">
+
+                <a
+                    href="{{ url_for('recommendation') }}"
+                    class="card-link"
+                >
+
+                    <span class="arrow">
+                        →
+                    </span>
+
+
+                    <div class="icon-box">
+                        💡
+                    </div>
+
+
+                    <h3>
+                        Smart Recommendation
+                    </h3>
+
+
+                    <p>
+
+                        Get bike recommendations
+                        based on your requirements.
+
+                    </p>
+
+                </a>
+
+            </div>
+
+
+            <!-- =================================================
+                 BIKE SCORE
+            ================================================== -->
+
+            <div class="service-card">
+
+                <a
+                    href="{{ url_for('bike_score') }}"
+                    class="card-link"
+                >
+
+                    <span class="arrow">
+                        →
+                    </span>
+
+
+                    <div class="icon-box">
+                        🏆
+                    </div>
+
+
+                    <h3>
+                        Bike Comparison Score
+                    </h3>
+
+
+                    <p>
+
+                        Check price, mileage and
+                        performance score.
+
+                    </p>
+
+                </a>
+
+            </div>
+
+
+            <!-- =================================================
+                 BIKE DETAILS
+            ================================================== -->
+
+            <div class="service-card">
+
+                <a
+                    href="{{ url_for('bikes') }}"
+                    class="card-link"
+                >
+
+                    <span class="arrow">
+                        →
+                    </span>
+
+
+                    <div class="icon-box">
+                        📋
+                    </div>
+
+
+                    <h3>
+                        Bike Details
+                    </h3>
+
+
+                    <p>
+
+                        View complete bike
+                        specifications and photos.
+
+                    </p>
+
+                </a>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         COST & MAINTENANCE
+    ====================================================== -->
+
+    <section class="section">
+
+
+        <div class="section-title">
+
+            <h2>
+                💰 Cost & Maintenance
+            </h2>
+
+            <div class="section-line"></div>
+
+        </div>
+
+
+        <div class="featured-grid">
+
+
+            <!-- TRIP COST -->
+
+            <div class="featured-card">
+
+                <div class="featured-icon">
+                    💰
+                </div>
+
+
+                <div class="featured-info">
+
+                    <h3>
+                        Trip Cost Calculator
+                    </h3>
+
+
+                    <p>
+
+                        Calculate fuel cost for
+                        your bike trip.
+
+                    </p>
+
+
+                    <br>
+
+
+                    <a
+                        href="{{ url_for('cost_calculator') }}"
+                        class="banner-btn"
+                    >
+
+                        Calculate →
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- MAINTENANCE -->
+
+            <div class="featured-card">
+
+                <div class="featured-icon">
+                    🔧
+                </div>
+
+
+                <div class="featured-info">
+
+                    <h3>
+                        Maintenance Cost
+                    </h3>
+
+
+                    <p>
+
+                        Calculate service and
+                        maintenance expenses.
+
+                    </p>
+
+
+                    <br>
+
+
+                    <a
+                        href="{{ url_for('maintenance') }}"
+                        class="banner-btn"
+                    >
+
+                        Calculate →
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- TEST RIDES -->
+
+            <div class="featured-card">
+
+                <div class="featured-icon">
+                    🛵
+                </div>
+
+
+                <div class="featured-info">
+
+                    <h3>
+                        My Test Rides
+                    </h3>
+
+
+                    <p>
+
+                        View and manage your
+                        test ride bookings.
+
+                    </p>
+
+
+                    <br>
+
+
+                    <a
+                        href="{{ url_for('my_test_rides') }}"
+                        class="banner-btn"
+                    >
+
+                        View Rides →
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- CUSTOMER SUPPORT -->
+
+            <div class="featured-card support-card">
+
+                <div class="featured-icon">
+                    💬
+                </div>
+
+
+                <div class="featured-info">
+
+                    <h3>
+                        Customer Support
+                    </h3>
+
+
+                    <p>
+
+                        Ask your doubts and
+                        receive admin replies.
+
+                    </p>
+
+
+                    <br>
+
+
+                    <a
+                        href="{{ url_for('ask_doubt') }}"
+                        class="banner-btn"
+                    >
+
+                        Ask Doubt →
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         QUICK ACCESS
+    ====================================================== -->
+
+    <section class="section">
+
+
+        <div class="section-title">
+
+            <h2>
+                ⚡ Quick Access
+            </h2>
+
+            <div class="section-line"></div>
+
+        </div>
+
+
+        <div class="stats">
+
+
+            <div class="stat">
+
+                <div class="stat-icon">
+                    🏍️
+                </div>
+
+                <h3>
+                    168+ Bikes
+                </h3>
+
+                <p>
+                    Browse available bikes
+                </p>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div class="stat-icon">
+                    🔍
+                </div>
+
+                <h3>
+                    Smart Search
+                </h3>
+
+                <p>
+                    Find your preferred bike
+                </p>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div class="stat-icon">
+                    ⚖️
+                </div>
+
+                <h3>
+                    Compare
+                </h3>
+
+                <p>
+                    Compare specifications
+                </p>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div class="stat-icon">
+                    💡
+                </div>
+
+                <h3>
+                    Recommendation
+                </h3>
+
+                <p>
+                    Find suitable bikes
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         BOTTOM BANNER
+    ====================================================== -->
+
+    <div class="bottom-banner">
+
+
+        <div>
+
+            <h2>
+                🏍️ Ready to find your bike?
+            </h2>
+
+
+            <p>
+
+                Explore bikes and find the one
+                that matches your requirements.
+
+            </p>
+
+        </div>
+
+
+        <a
+            href="{{ url_for('bikes') }}"
+            class="banner-btn"
+        >
+
+            Explore Bikes →
+
+        </a>
+
+
+    </div>
+
+
+</div>
+
+
+{% endblock %}

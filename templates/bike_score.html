@@ -1,0 +1,518 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+    .score-page {
+        width: 100%;
+    }
+
+    .title {
+        text-align: center;
+        padding: 35px 10px;
+    }
+
+    .title h1 {
+        color: #ff6a00;
+        font-size: 36px;
+        margin-bottom: 10px;
+    }
+
+    .title p {
+        color: #aaa;
+        font-size: 17px;
+    }
+
+
+    /* FORM */
+
+    .score-box {
+        width: 90%;
+        max-width: 900px;
+
+        margin: 0 auto 35px auto;
+
+        background: #1c1c1c;
+
+        border: 1px solid #333;
+
+        border-radius: 12px;
+
+        padding: 30px;
+    }
+
+    .score-box h2 {
+        color: #ff6a00;
+
+        margin-bottom: 25px;
+    }
+
+    .score-box label {
+        display: block;
+
+        color: #ccc;
+
+        margin-bottom: 8px;
+    }
+
+    .score-box select {
+        width: 100%;
+
+        padding: 14px;
+
+        background: #252525;
+
+        color: white;
+
+        border: 1px solid #444;
+
+        border-radius: 7px;
+
+        font-size: 15px;
+
+        outline: none;
+    }
+
+    .score-box select:focus {
+        border-color: #ff6a00;
+    }
+
+
+    /* BUTTON */
+
+    .score-button {
+        width: 100%;
+
+        margin-top: 25px;
+
+        padding: 15px;
+
+        background: #ff6a00;
+
+        color: white;
+
+        border: none;
+
+        border-radius: 7px;
+
+        font-size: 17px;
+
+        font-weight: bold;
+
+        cursor: pointer;
+    }
+
+    .score-button:hover {
+        background: #e65c00;
+    }
+
+
+    /* RESULT */
+
+    .result-box {
+        width: 90%;
+        max-width: 900px;
+
+        margin: 0 auto 50px auto;
+
+        background: #1c1c1c;
+
+        border: 1px solid #333;
+
+        border-radius: 12px;
+
+        padding: 30px;
+    }
+
+    .result-box h2 {
+        text-align: center;
+
+        color: #ff6a00;
+
+        margin-bottom: 25px;
+    }
+
+
+    /* BIKE NAME */
+
+    .bike-name {
+        text-align: center;
+
+        font-size: 28px;
+
+        font-weight: bold;
+
+        margin-bottom: 30px;
+    }
+
+    .bike-brand {
+        text-align: center;
+
+        color: #ff6a00;
+
+        font-size: 16px;
+
+        font-weight: bold;
+
+        text-transform: uppercase;
+
+        margin-bottom: 5px;
+    }
+
+
+    /* SCORE CARDS */
+
+    .score-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(3, 1fr);
+
+        gap: 15px;
+
+        margin-bottom: 25px;
+    }
+
+    .score-card {
+        background: #252525;
+
+        border: 1px solid #333;
+
+        border-radius: 10px;
+
+        padding: 20px;
+
+        text-align: center;
+    }
+
+    .score-card span {
+        display: block;
+
+        color: #999;
+
+        font-size: 14px;
+
+        margin-bottom: 10px;
+    }
+
+    .score-card strong {
+        color: #ff6a00;
+
+        font-size: 28px;
+    }
+
+
+    /* OVERALL SCORE */
+
+    .overall {
+        background: #000;
+
+        border: 2px solid #ff6a00;
+
+        border-radius: 12px;
+
+        text-align: center;
+
+        padding: 25px;
+    }
+
+    .overall span {
+        display: block;
+
+        color: #aaa;
+
+        font-size: 16px;
+
+        margin-bottom: 10px;
+    }
+
+    .overall strong {
+        color: #ff6a00;
+
+        font-size: 50px;
+    }
+
+    .out-of {
+        color: #aaa;
+
+        font-size: 18px;
+    }
+
+
+    /* INFORMATION */
+
+    .info-box {
+        margin-top: 25px;
+
+        background: #181818;
+
+        border-left: 4px solid #ff6a00;
+
+        padding: 18px;
+
+        color: #aaa;
+
+        line-height: 1.6;
+    }
+
+    .info-box strong {
+        color: #ff6a00;
+    }
+
+
+    /* MOBILE */
+
+    @media(max-width: 700px) {
+
+        .title h1 {
+            font-size: 30px;
+        }
+
+        .score-box,
+        .result-box {
+            width: 94%;
+        }
+
+        .score-grid {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+</style>
+
+
+<div class="score-page">
+
+
+    <!-- =====================================
+         TITLE
+    ====================================== -->
+
+    <div class="title">
+
+        <h1>
+            Bike Comparison Score
+        </h1>
+
+        <p>
+            Get an overall score based on price, mileage and performance
+        </p>
+
+    </div>
+
+
+    <!-- =====================================
+         SELECT BIKE
+    ====================================== -->
+
+    <div class="score-box">
+
+        <h2>
+            Select a Bike
+        </h2>
+
+
+        <form method="POST"
+              action="{{ url_for('bike_score') }}">
+
+
+            <label>
+                Choose Bike
+            </label>
+
+
+            <select name="bike_id"
+                    required>
+
+                <option value="">
+                    Select a bike
+                </option>
+
+
+                {% for bike in bikes %}
+
+                <option value="{{ bike[0] }}">
+
+                    {{ bike[1] }} {{ bike[2] }}
+
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+
+            <button
+                type="submit"
+                class="score-button">
+
+                ⭐ Calculate Bike Score
+
+            </button>
+
+
+        </form>
+
+    </div>
+
+
+    <!-- =====================================
+         RESULT
+    ====================================== -->
+
+    {% if result %}
+
+    <div class="result-box">
+
+
+        <h2>
+            Bike Score Result
+        </h2>
+
+
+        <div class="bike-brand">
+
+            {{ result.bike[1] }}
+
+        </div>
+
+
+        <div class="bike-name">
+
+            {{ result.bike[2] }}
+
+        </div>
+
+
+        <!-- SCORE BREAKDOWN -->
+
+        <div class="score-grid">
+
+
+            <!-- PRICE -->
+
+            <div class="score-card">
+
+                <span>
+                    Price Score
+                </span>
+
+                <strong>
+
+                    {{ result.price_score }}
+
+                </strong>
+
+                <small style="color:#777;">
+                    / 30
+                </small>
+
+            </div>
+
+
+            <!-- MILEAGE -->
+
+            <div class="score-card">
+
+                <span>
+                    Mileage Score
+                </span>
+
+                <strong>
+
+                    {{ result.mileage_score }}
+
+                </strong>
+
+                <small style="color:#777;">
+                    / 30
+                </small>
+
+            </div>
+
+
+            <!-- PERFORMANCE -->
+
+            <div class="score-card">
+
+                <span>
+                    Performance Score
+                </span>
+
+                <strong>
+
+                    {{ result.performance_score }}
+
+                </strong>
+
+                <small style="color:#777;">
+                    / 40
+                </small>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- OVERALL -->
+
+        <div class="overall">
+
+            <span>
+                Overall Bike Score
+            </span>
+
+            <strong>
+
+                {{ result.overall_score }}
+
+            </strong>
+
+            <div class="out-of">
+                / 100
+            </div>
+
+        </div>
+
+
+        <!-- INFO -->
+
+        <div class="info-box">
+
+            <strong>
+                Score Calculation:
+            </strong>
+
+            <br>
+
+            Price Score = 30 marks maximum
+
+            <br>
+
+            Mileage Score = 30 marks maximum
+
+            <br>
+
+            Performance Score = 40 marks maximum
+
+            <br>
+
+            <strong>
+                Total = 100 marks
+            </strong>
+
+        </div>
+
+
+    </div>
+
+    {% endif %}
+
+
+</div>
+
+
+{% endblock %}

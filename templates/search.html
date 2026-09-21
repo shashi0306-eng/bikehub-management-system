@@ -1,0 +1,1131 @@
+{% extends "base.html" %}
+
+{% block title %}
+Search & Filter - BikeHub
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: #0b0b0b;
+}
+
+/* =========================================
+   MAIN PAGE
+========================================= */
+
+.search-page {
+    width: 94%;
+    max-width: 1500px;
+    margin: 30px auto 60px;
+}
+
+/* =========================================
+   PAGE HEADER
+========================================= */
+
+.page-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.page-header h1 {
+    color: #ff6600;
+    font-size: 38px;
+    margin: 0 0 8px;
+}
+
+.page-header p {
+    color: #aaa;
+    font-size: 16px;
+    margin: 0;
+}
+
+/* =========================================
+   FILTER BOX
+========================================= */
+
+.filter-box {
+    background: #171717;
+    border: 1px solid #333;
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 30px;
+}
+
+.filter-title {
+    color: white;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.filter-title span {
+    color: #ff6600;
+}
+
+/* =========================================
+   FILTER GRID
+========================================= */
+
+.filters {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+}
+
+.field label {
+    color: #aaa;
+    font-size: 13px;
+    margin-bottom: 7px;
+}
+
+.field input,
+.field select {
+    width: 100%;
+    padding: 13px;
+    background: #252525;
+    border: 1px solid #444;
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    outline: none;
+}
+
+.field input:focus,
+.field select:focus {
+    border-color: #ff6600;
+    box-shadow: 0 0 0 2px rgba(255, 102, 0, 0.12);
+}
+
+.field select option {
+    background: #222;
+    color: white;
+}
+
+/* =========================================
+   FILTER BUTTONS
+========================================= */
+
+.filter-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.search-btn {
+    background: #ff6600;
+    border: none;
+    color: white;
+    padding: 13px 28px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.search-btn:hover {
+    background: #e65c00;
+}
+
+.clear-btn {
+    display: inline-block;
+    background: #292929;
+    color: white;
+    text-decoration: none;
+    padding: 13px 28px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.clear-btn:hover {
+    background: #3a3a3a;
+}
+
+/* =========================================
+   RESULTS HEADER
+========================================= */
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.results-header h2 {
+    color: white;
+    margin: 0;
+    font-size: 25px;
+}
+
+.result-count {
+    color: #ff6600;
+    font-weight: bold;
+}
+
+/* =========================================
+   BIKE GRID
+========================================= */
+
+.bike-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px;
+}
+
+/* =========================================
+   BIKE CARD
+========================================= */
+
+.bike-card {
+    background: #171717;
+    border: 1px solid #333;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: 0.25s;
+}
+
+.bike-card:hover {
+    transform: translateY(-5px);
+    border-color: #ff6600;
+    box-shadow: 0 10px 30px rgba(255, 102, 0, 0.15);
+}
+
+/* =========================================
+   BIKE PHOTO
+========================================= */
+
+.bike-photo {
+    width: 100%;
+    height: 245px;
+    background: #050505;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.bike-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    background: #050505;
+}
+
+.no-photo {
+    color: #666;
+    font-size: 55px;
+}
+
+/* =========================================
+   BIKE BODY
+========================================= */
+
+.bike-body {
+    padding: 18px;
+}
+
+.brand {
+    color: #ff6600;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.model {
+    color: white;
+    font-size: 23px;
+    margin: 7px 0 12px;
+}
+
+/* =========================================
+   PRICE
+========================================= */
+
+.price {
+    color: #00c853;
+    font-size: 21px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+/* =========================================
+   SPECIFICATIONS
+========================================= */
+
+.spec-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.spec {
+    background: #242424;
+    padding: 10px;
+    border-radius: 7px;
+}
+
+.spec-label {
+    display: block;
+    color: #888;
+    font-size: 11px;
+    margin-bottom: 4px;
+}
+
+.spec-value {
+    color: white;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+/* =========================================
+   DETAILS BUTTON
+========================================= */
+
+.details-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+    background: #ff6600;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 16px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.details-btn:hover {
+    background: #e65c00;
+}
+
+/* =========================================
+   NO RESULTS
+========================================= */
+
+.no-results {
+    background: #171717;
+    border: 1px solid #333;
+    border-radius: 15px;
+    text-align: center;
+    padding: 70px 20px;
+}
+
+.no-results-icon {
+    font-size: 55px;
+    margin-bottom: 15px;
+}
+
+.no-results h2 {
+    color: white;
+    margin-bottom: 10px;
+}
+
+.no-results p {
+    color: #888;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1200px) {
+
+    .bike-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .filters {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+
+    .bike-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .filters {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+
+    .search-page {
+        width: 94%;
+    }
+
+    .page-header h1 {
+        font-size: 29px;
+    }
+
+    .filters {
+        grid-template-columns: 1fr;
+    }
+
+    .bike-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-box {
+        padding: 18px;
+    }
+
+    .filter-buttons {
+        flex-direction: column;
+    }
+
+    .search-btn,
+    .clear-btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .results-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+</style>
+
+
+<div class="search-page">
+
+    <!-- =====================================
+         PAGE HEADER
+    ====================================== -->
+
+    <div class="page-header">
+
+        <h1>
+            🔎 Search & Filter Bikes
+        </h1>
+
+        <p>
+            Find the right bike according to your requirements
+        </p>
+
+    </div>
+
+
+    <!-- =====================================
+         FILTER BOX
+    ====================================== -->
+
+    <div class="filter-box">
+
+        <div class="filter-title">
+            <span>⚙️</span>
+            Search & Filters
+        </div>
+
+
+        <form
+            method="GET"
+            action="{{ url_for('search') }}"
+        >
+
+            <div class="filters">
+
+                <!-- SEARCH -->
+
+                <div class="field">
+
+                    <label>
+                        🔍 Bike Name / Model
+                    </label>
+
+                    <input
+                        type="text"
+                        name="search"
+                        placeholder="Example: Duke 200"
+                        value="{{ request.args.get('search', '') }}"
+                    >
+
+                </div>
+
+
+                <!-- BRAND -->
+
+                <div class="field">
+
+                    <label>
+                        🏷️ Brand
+                    </label>
+
+                    <select name="brand">
+
+                        <option value="">
+                            All Brands
+                        </option>
+
+                        {% for brand_name in [
+
+                            'KTM',
+                            'TVS',
+                            'Yamaha',
+                            'Bajaj',
+                            'Honda',
+                            'Hero',
+                            'Royal Enfield',
+                            'Kawasaki',
+                            'Suzuki',
+                            'Triumph',
+                            'BMW',
+                            'Aprilia',
+                            'Husqvarna',
+                            'Harley-Davidson',
+                            'Ducati',
+                            'Jawa',
+                            'Yezdi',
+                            'Benelli'
+
+                        ] %}
+
+                        <option
+                            value="{{ brand_name }}"
+                            {% if request.args.get('brand', '') == brand_name %}
+                                selected
+                            {% endif %}
+                        >
+
+                            {{ brand_name }}
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- CC -->
+
+                <div class="field">
+
+                    <label>
+                        ⚙️ Engine Capacity
+                    </label>
+
+                    <select name="cc">
+
+                        <option value="">
+                            All CC
+                        </option>
+
+                        <option
+                            value="100-125"
+                            {% if request.args.get('cc') == '100-125' %}
+                                selected
+                            {% endif %}
+                        >
+                            100 - 125 CC
+                        </option>
+
+                        <option
+                            value="126-160"
+                            {% if request.args.get('cc') == '126-160' %}
+                                selected
+                            {% endif %}
+                        >
+                            126 - 160 CC
+                        </option>
+
+                        <option
+                            value="161-200"
+                            {% if request.args.get('cc') == '161-200' %}
+                                selected
+                            {% endif %}
+                        >
+                            161 - 200 CC
+                        </option>
+
+                        <option
+                            value="201-250"
+                            {% if request.args.get('cc') == '201-250' %}
+                                selected
+                            {% endif %}
+                        >
+                            201 - 250 CC
+                        </option>
+
+                        <option
+                            value="251+"
+                            {% if request.args.get('cc') == '251+' %}
+                                selected
+                            {% endif %}
+                        >
+                            251+ CC
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- PRICE -->
+
+                <div class="field">
+
+                    <label>
+                        💰 Price Range
+                    </label>
+
+                    <select name="price">
+
+                        <option value="">
+                            All Prices
+                        </option>
+
+                        <option
+                            value="0-150000"
+                            {% if request.args.get('price') == '0-150000' %}
+                                selected
+                            {% endif %}
+                        >
+                            Up to ₹1.5 Lakh
+                        </option>
+
+                        <option
+                            value="150000-200000"
+                            {% if request.args.get('price') == '150000-200000' %}
+                                selected
+                            {% endif %}
+                        >
+                            ₹1.5 - ₹2 Lakh
+                        </option>
+
+                        <option
+                            value="200000-300000"
+                            {% if request.args.get('price') == '200000-300000' %}
+                                selected
+                            {% endif %}
+                        >
+                            ₹2 - ₹3 Lakh
+                        </option>
+
+                        <option
+                            value="300000+"
+                            {% if request.args.get('price') == '300000+' %}
+                                selected
+                            {% endif %}
+                        >
+                            Above ₹3 Lakh
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- MILEAGE -->
+
+                <div class="field">
+
+                    <label>
+                        ⛽ Minimum Mileage
+                    </label>
+
+                    <select name="mileage">
+
+                        <option value="">
+                            Any Mileage
+                        </option>
+
+                        <option
+                            value="30"
+                            {% if request.args.get('mileage') == '30' %}
+                                selected
+                            {% endif %}
+                        >
+                            30+ km/l
+                        </option>
+
+                        <option
+                            value="35"
+                            {% if request.args.get('mileage') == '35' %}
+                                selected
+                            {% endif %}
+                        >
+                            35+ km/l
+                        </option>
+
+                        <option
+                            value="40"
+                            {% if request.args.get('mileage') == '40' %}
+                                selected
+                            {% endif %}
+                        >
+                            40+ km/l
+                        </option>
+
+                        <option
+                            value="45"
+                            {% if request.args.get('mileage') == '45' %}
+                                selected
+                            {% endif %}
+                        >
+                            45+ km/l
+                        </option>
+
+                        <option
+                            value="50"
+                            {% if request.args.get('mileage') == '50' %}
+                                selected
+                            {% endif %}
+                        >
+                            50+ km/l
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- SORT -->
+
+                <div class="field">
+
+                    <label>
+                        ↕️ Sort By
+                    </label>
+
+                    <select name="sort">
+
+                        <option value="">
+                            Default
+                        </option>
+
+                        <option
+                            value="low"
+                            {% if request.args.get('sort') == 'low' %}
+                                selected
+                            {% endif %}
+                        >
+                            Price: Low to High
+                        </option>
+
+                        <option
+                            value="high"
+                            {% if request.args.get('sort') == 'high' %}
+                                selected
+                            {% endif %}
+                        >
+                            Price: High to Low
+                        </option>
+
+                        <option
+                            value="mileage"
+                            {% if request.args.get('sort') == 'mileage' %}
+                                selected
+                            {% endif %}
+                        >
+                            Mileage: High to Low
+                        </option>
+
+                        <option
+                            value="cc"
+                            {% if request.args.get('sort') == 'cc' %}
+                                selected
+                            {% endif %}
+                        >
+                            CC: Low to High
+                        </option>
+
+                        <option
+                            value="name"
+                            {% if request.args.get('sort') == 'name' %}
+                                selected
+                            {% endif %}
+                        >
+                            Brand / Name
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- BUTTONS -->
+
+            <div class="filter-buttons">
+
+                <button
+                    type="submit"
+                    class="search-btn"
+                >
+                    🔍 Search Bikes
+                </button>
+
+                <a
+                    href="{{ url_for('search') }}"
+                    class="clear-btn"
+                >
+                    ✕ Clear Filters
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- =====================================
+         RESULTS HEADER
+    ====================================== -->
+
+    <div class="results-header">
+
+        <h2>
+            🏍️ Available Bikes
+        </h2>
+
+        <div class="result-count">
+
+            {{ bikes|length }}
+            bike(s) found
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================
+         RESULTS
+    ====================================== -->
+
+    {% if bikes %}
+
+    <div class="bike-grid">
+
+        {% for bike in bikes %}
+
+        <!-- =================================
+             CREATE EXACT FOLDER NAME
+        ================================== -->
+
+        {% set brand_name = bike[1]|string
+            |replace(" ", "_")
+            |replace("-", "_")
+            |replace("+", "_")
+        %}
+
+        {% set model_name = bike[2]|string
+            |replace(" ", "_")
+            |replace("-", "_")
+            |replace("+", "_")
+        %}
+
+        {% set folder_name = "%03d_%s_%s"|format(
+            bike[0],
+            brand_name,
+            model_name
+        ) %}
+
+
+        <div class="bike-card">
+
+            <!-- =================================
+                 BIKE IMAGE
+            ================================== -->
+
+            <div class="bike-photo">
+
+                <img
+                    src="{{ url_for(
+                        'bike_image',
+                        filename=folder_name ~ '/' ~ folder_name ~ '_1.jpg'
+                    ) }}"
+                    alt="{{ bike[1] }} {{ bike[2] }}"
+                    loading="lazy"
+                    onerror="handleBikeImageError(this, '{{ folder_name }}')"
+                >
+
+                <div
+                    class="no-photo"
+                    style="display:none;"
+                >
+                    🏍️
+                </div>
+
+            </div>
+
+
+            <!-- =================================
+                 BIKE INFORMATION
+            ================================== -->
+
+            <div class="bike-body">
+
+                <div class="brand">
+                    {{ bike[1] }}
+                </div>
+
+                <div class="model">
+                    {{ bike[2] }}
+                </div>
+
+                <div class="price">
+                    ₹{{ bike[4] }}
+                </div>
+
+
+                <!-- =================================
+                     SPECIFICATIONS
+                ================================== -->
+
+                <div class="spec-grid">
+
+                    <div class="spec">
+
+                        <span class="spec-label">
+                            Engine
+                        </span>
+
+                        <span class="spec-value">
+                            {{ bike[3] }} CC
+                        </span>
+
+                    </div>
+
+
+                    <div class="spec">
+
+                        <span class="spec-label">
+                            Mileage
+                        </span>
+
+                        <span class="spec-value">
+                            {{ bike[5] }} km/l
+                        </span>
+
+                    </div>
+
+
+                    <div class="spec">
+
+                        <span class="spec-label">
+                            Power
+                        </span>
+
+                        <span class="spec-value">
+                            {{ bike[6] }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="spec">
+
+                        <span class="spec-label">
+                            Torque
+                        </span>
+
+                        <span class="spec-value">
+                            {{ bike[7] }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="spec">
+
+                        <span class="spec-label">
+                            Fuel
+                        </span>
+
+                        <span class="spec-value">
+                            {{ bike[8] }} L
+                        </span>
+
+                    </div>
+
+
+                    <div class="spec">
+
+                        <span class="spec-label">
+                            Availability
+                        </span>
+
+                        <span class="spec-value">
+                            {{ bike[9] }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================
+                     VIEW DETAILS
+                ================================== -->
+
+                <a
+                    href="{{ url_for(
+                        'bike_details',
+                        bike_id=bike[0]
+                    ) }}"
+                    class="details-btn"
+                >
+                    View Details →
+                </a>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    {% else %}
+
+    <!-- =====================================
+         NO RESULTS
+    ====================================== -->
+
+    <div class="no-results">
+
+        <div class="no-results-icon">
+            🔍
+        </div>
+
+        <h2>
+            No Bikes Found
+        </h2>
+
+        <p>
+            Try changing your search or filter options.
+        </p>
+
+        <a
+            href="{{ url_for('search') }}"
+            class="clear-btn"
+            style="display:inline-block; margin-top:15px;"
+        >
+            Show All Bikes
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- =========================================
+     IMAGE ERROR HANDLING
+========================================= -->
+
+<script>
+
+function handleBikeImageError(image, folderName) {
+
+    if (!image) {
+        return;
+    }
+
+    /*
+       Try photo 2
+    */
+
+    if (!image.dataset.try2) {
+
+        image.dataset.try2 = "1";
+
+        image.src =
+            "{{ url_for('bike_image', filename='PLACEHOLDER') }}"
+            .replace(
+                "PLACEHOLDER",
+                folderName + "/" + folderName + "_2.jpg"
+            );
+
+        return;
+    }
+
+
+    /*
+       Try photo 3
+    */
+
+    if (!image.dataset.try3) {
+
+        image.dataset.try3 = "1";
+
+        image.src =
+            "{{ url_for('bike_image', filename='PLACEHOLDER') }}"
+            .replace(
+                "PLACEHOLDER",
+                folderName + "/" + folderName + "_3.jpg"
+            );
+
+        return;
+    }
+
+
+    /*
+       Try photo 4
+    */
+
+    if (!image.dataset.try4) {
+
+        image.dataset.try4 = "1";
+
+        image.src =
+            "{{ url_for('bike_image', filename='PLACEHOLDER') }}"
+            .replace(
+                "PLACEHOLDER",
+                folderName + "/" + folderName + "_4.jpg"
+            );
+
+        return;
+    }
+
+
+    /*
+       If all photos are missing,
+       show motorcycle icon.
+    */
+
+    image.style.display = "none";
+
+    if (image.nextElementSibling) {
+        image.nextElementSibling.style.display = "flex";
+        image.nextElementSibling.style.alignItems = "center";
+        image.nextElementSibling.style.justifyContent = "center";
+        image.nextElementSibling.style.width = "100%";
+        image.nextElementSibling.style.height = "100%";
+    }
+
+}
+
+</script>
+
+{% endblock %}

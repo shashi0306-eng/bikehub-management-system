@@ -1,0 +1,239 @@
+{% extends "admin_base.html" %}
+
+{% block title %}
+Edit Bike - BikeHub
+{% endblock %}
+
+
+{% block content %}
+
+<div class="page-header">
+
+    <h1>✏️ Edit Bike</h1>
+
+    <p>
+        Update motorcycle information
+    </p>
+
+</div>
+
+
+<div class="form-container">
+
+<form
+    method="POST"
+    action="{{ url_for('edit_bike', bike_id=bike[0]) }}"
+>
+
+
+    <div class="form-grid">
+
+
+        <div class="form-group">
+
+            <label>Brand</label>
+
+            <input
+                type="text"
+                name="brand"
+                value="{{ bike[1] }}"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Model</label>
+
+            <input
+                type="text"
+                name="model"
+                value="{{ bike[2] }}"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Engine CC</label>
+
+            <input
+                type="number"
+                name="cc"
+                value="{{ bike[3] }}"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Price</label>
+
+            <input
+                type="number"
+                step="0.01"
+                name="price"
+                value="{{ bike[4] }}"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Mileage</label>
+
+            <input
+                type="number"
+                step="0.01"
+                name="mileage"
+                value="{{ bike[5] }}"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Power</label>
+
+            <input
+                type="text"
+                name="power"
+                value="{{ bike[6] }}"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Torque</label>
+
+            <input
+                type="text"
+                name="torque"
+                value="{{ bike[7] }}"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Fuel Capacity</label>
+
+            <input
+                type="number"
+                step="0.01"
+                name="fuel_capacity"
+                value="{{ bike[8] }}"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Availability</label>
+
+            <select
+                name="availability"
+                required
+            >
+
+                <option
+                    value="Available"
+                    {% if bike[9] == "Available" %}
+                    selected
+                    {% endif %}
+                >
+                    Available
+                </option>
+
+                <option
+                    value="Not Available"
+                    {% if bike[9] == "Not Available" %}
+                    selected
+                    {% endif %}
+                >
+                    Not Available
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Vehicle Type</label>
+
+            <select
+                name="vehicle_type"
+                required
+            >
+
+                <option
+                    value="Motorcycle"
+                    {% if bike[10] == "Motorcycle" %}
+                    selected
+                    {% endif %}
+                >
+                    Motorcycle
+                </option>
+
+                <option
+                    value="Scooter"
+                    {% if bike[10] == "Scooter" %}
+                    selected
+                    {% endif %}
+                >
+                    Scooter
+                </option>
+
+            </select>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="form-actions">
+
+        <button
+            type="submit"
+            class="orange-btn"
+        >
+            💾 Save Changes
+        </button>
+
+
+        <a
+            href="{{ url_for('admin_bikes') }}"
+            class="orange-btn"
+            style="background:#333;"
+        >
+            ← Cancel
+        </a>
+
+    </div>
+
+
+</form>
+
+</div>
+
+{% endblock %}

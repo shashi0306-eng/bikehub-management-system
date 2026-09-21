@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    .register-container {
+        max-width: 500px;
+        margin: 40px auto;
+        padding: 30px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+
+    .register-container h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #222;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 7px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 15px;
+        box-sizing: border-box;
+    }
+
+    .form-group input:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+    .hint {
+        font-size: 13px;
+        color: #777;
+        margin-top: 5px;
+    }
+
+    .password-rules {
+        margin-top: 10px;
+        padding: 12px;
+        background: #f5f5f5;
+        border-radius: 6px;
+    }
+
+    .password-rules p {
+        margin: 5px 0;
+        font-size: 13px;
+        color: #d00000;
+    }
+
+    .password-rules p.valid {
+        color: green;
+    }
+
+    .password-rules p::before {
+        content: "✖ ";
+    }
+
+    .password-rules p.valid::before {
+        content: "✔ ";
+    }
+
+    .register-btn {
+        width: 100%;
+        padding: 12px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .register-btn:hover {
+        background: #0056b3;
+    }
+
+    .error-message {
+        background: #ffe5e5;
+        color: #c00000;
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 15px;
+    }
+
+    .login-link a {
+        color: #007bff;
+        text-decoration: none;
+    }
+</style>
+
+<div class="register-container">
+
+    <h2>User Registration</h2>
+
+    {% if error %}
+        <div class="error-message">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('register') }}">
+
+        <!-- NAME -->
+        <div class="form-group">
+            <label for="name">Name</label>
+
+            <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="Enter your name"
+                pattern="[A-Za-z ]+"
+                title="Name should contain only alphabets and spaces"
+                oninput="this.value = this.value.replace(/[^A-Za-z ]/g, '')"
+                required
+            >
+
+            <div class="hint">
+                Only alphabets and spaces are allowed.
+            </div>
+        </div>
+
+
+        <!-- PHONE -->
+        <div class="form-group">
+            <label for="mobile">Phone Number</label>
+
+            <input
+                type="tel"
+                id="mobile"
+                name="mobile"
+                placeholder="Enter 10 digit phone number"
+                inputmode="numeric"
+                maxlength="10"
+                pattern="[0-9]{10}"
+                title="Phone number must contain exactly 10 digits"
+                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                required
+            >
+
+            <div class="hint">
+                Only numbers are allowed. Enter exactly 10 digits.
+            </div>
+        </div>
+
+
+        <!-- EMAIL -->
+        <div class="form-group">
+            <label for="email">Email</label>
+
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Enter your email"
+                required
+            >
+        </div>
+
+
+        <!-- PASSWORD -->
+        <div class="form-group">
+            <label for="password">Password</label>
+
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Create a strong password"
+                required
+                oninput="checkPassword()"
+            >
+
+            <div class="password-rules">
+
+                <p id="length">
+                    Minimum 8 characters
+                </p>
+
+                <p id="uppercase">
+                    At least one uppercase letter (A-Z)
+                </p>
+
+                <p id="lowercase">
+                    At least one lowercase letter (a-z)
+                </p>
+
+                <p id="number">
+                    At least one number (0-9)
+                </p>
+
+                <p id="special">
+                    At least one special character (!@#$%^&*)
+                </p>
+
+            </div>
+        </div>
+
+
+        <!-- SUBMIT -->
+        <button type="submit" class="register-btn">
+            Register
+        </button>
+
+    </form>
+
+    <div class="login-link">
+        Already have an account?
+        <a href="{{ url_for('login') }}">Login here</a>
+    </div>
+
+</div>
+
+
+<script>
+
+function checkPassword() {
+
+    const password = document.getElementById("password").value;
+
+    // Minimum 8 characters
+    if (password.length >= 8) {
+        document.getElementById("length").classList.add("valid");
+    } else {
+        document.getElementById("length").classList.remove("valid");
+    }
+
+    // Uppercase
+    if (/[A-Z]/.test(password)) {
+        document.getElementById("uppercase").classList.add("valid");
+    } else {
+        document.getElementById("uppercase").classList.remove("valid");
+    }
+
+    // Lowercase
+    if (/[a-z]/.test(password)) {
+        document.getElementById("lowercase").classList.add("valid");
+    } else {
+        document.getElementById("lowercase").classList.remove("valid");
+    }
+
+    // Number
+    if (/[0-9]/.test(password)) {
+        document.getElementById("number").classList.add("valid");
+    } else {
+        document.getElementById("number").classList.remove("valid");
+    }
+
+    // Special character
+    if (/[!@#$%^&*]/.test(password)) {
+        document.getElementById("special").classList.add("valid");
+    } else {
+        document.getElementById("special").classList.remove("valid");
+    }
+}
+
+</script>
+
+{% endblock %}

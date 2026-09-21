@@ -1,0 +1,463 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+    /* =========================================
+       PAGE
+    ========================================= */
+
+    .maintenance-page {
+        width: 100%;
+    }
+
+
+    /* =========================================
+       TITLE
+    ========================================= */
+
+    .title {
+        text-align: center;
+        padding: 35px 10px;
+    }
+
+
+    .title h1 {
+        color: #ff6a00;
+        font-size: 36px;
+        margin-bottom: 10px;
+    }
+
+
+    .title p {
+        color: #aaa;
+        font-size: 17px;
+    }
+
+
+    /* =========================================
+       MAIN BOX
+    ========================================= */
+
+    .maintenance-box {
+        width: 90%;
+        max-width: 900px;
+
+        margin: 0 auto 35px auto;
+
+        background: #1c1c1c;
+
+        border: 1px solid #333;
+
+        border-radius: 12px;
+
+        padding: 30px;
+    }
+
+
+    .maintenance-box h2 {
+        color: #ff6a00;
+
+        font-size: 25px;
+
+        margin-bottom: 25px;
+    }
+
+
+    /* =========================================
+       FORM
+    ========================================= */
+
+    .form-grid {
+        display: grid;
+
+        grid-template-columns: 1fr 1fr;
+
+        gap: 20px;
+    }
+
+
+    .form-group {
+        display: flex;
+
+        flex-direction: column;
+    }
+
+
+    .form-group label {
+        color: #ccc;
+
+        font-size: 15px;
+
+        margin-bottom: 8px;
+    }
+
+
+    .form-group input {
+        width: 100%;
+
+        padding: 14px;
+
+        background: #252525;
+
+        color: white;
+
+        border: 1px solid #444;
+
+        border-radius: 7px;
+
+        font-size: 15px;
+
+        outline: none;
+    }
+
+
+    .form-group input:focus {
+        border-color: #ff6a00;
+    }
+
+
+    /* =========================================
+       BUTTON
+    ========================================= */
+
+    .calculate-button {
+        width: 100%;
+
+        margin-top: 25px;
+
+        padding: 15px;
+
+        background: #ff6a00;
+
+        color: white;
+
+        border: none;
+
+        border-radius: 7px;
+
+        font-size: 17px;
+
+        font-weight: bold;
+
+        cursor: pointer;
+
+        transition: 0.3s;
+    }
+
+
+    .calculate-button:hover {
+        background: #e65c00;
+    }
+
+
+    /* =========================================
+       RESULT
+    ========================================= */
+
+    .result-box {
+        width: 90%;
+
+        max-width: 900px;
+
+        margin: 0 auto 35px auto;
+
+        background: #1c1c1c;
+
+        border: 1px solid #333;
+
+        border-radius: 12px;
+
+        padding: 35px;
+
+        text-align: center;
+    }
+
+
+    .result-box h2 {
+        color: #ff6a00;
+
+        margin-bottom: 25px;
+    }
+
+
+    .total-card {
+        background: #252525;
+
+        border: 1px solid #333;
+
+        border-radius: 10px;
+
+        padding: 30px;
+    }
+
+
+    .total-card span {
+        display: block;
+
+        color: #999;
+
+        font-size: 15px;
+
+        margin-bottom: 10px;
+    }
+
+
+    .total-card strong {
+        color: #ff6a00;
+
+        font-size: 35px;
+    }
+
+
+    /* =========================================
+       INFORMATION
+    ========================================= */
+
+    .info-box {
+        width: 90%;
+
+        max-width: 900px;
+
+        margin: 0 auto 50px auto;
+
+        padding: 20px;
+
+        background: #181818;
+
+        border-left: 4px solid #ff6a00;
+
+        color: #aaa;
+
+        line-height: 1.6;
+    }
+
+
+    .info-box strong {
+        color: #ff6a00;
+    }
+
+
+    /* =========================================
+       MOBILE
+    ========================================= */
+
+    @media(max-width: 700px) {
+
+        .title h1 {
+            font-size: 30px;
+        }
+
+
+        .maintenance-box,
+        .result-box,
+        .info-box {
+            width: 94%;
+        }
+
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+</style>
+
+
+<div class="maintenance-page">
+
+
+    <!-- =====================================
+         TITLE
+    ====================================== -->
+
+    <div class="title">
+
+        <h1>
+            Maintenance Cost Calculator
+        </h1>
+
+        <p>
+            Calculate your bike maintenance expenses
+        </p>
+
+    </div>
+
+
+    <!-- =====================================
+         FORM
+    ====================================== -->
+
+    <div class="maintenance-box">
+
+        <h2>
+            Enter Maintenance Expenses
+        </h2>
+
+
+        <form method="POST"
+              action="{{ url_for('maintenance') }}">
+
+
+            <div class="form-grid">
+
+
+                <!-- SERVICE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Service Cost (₹)
+                    </label>
+
+                    <input
+                        type="number"
+                        name="service"
+                        placeholder="Example: 1500"
+                        min="0"
+                        step="0.01"
+                        value="0"
+                    >
+
+                </div>
+
+
+                <!-- OIL -->
+
+                <div class="form-group">
+
+                    <label>
+                        Engine Oil Cost (₹)
+                    </label>
+
+                    <input
+                        type="number"
+                        name="oil"
+                        placeholder="Example: 800"
+                        min="0"
+                        step="0.01"
+                        value="0"
+                    >
+
+                </div>
+
+
+                <!-- TYRES -->
+
+                <div class="form-group">
+
+                    <label>
+                        Tyres Cost (₹)
+                    </label>
+
+                    <input
+                        type="number"
+                        name="tyres"
+                        placeholder="Example: 4000"
+                        min="0"
+                        step="0.01"
+                        value="0"
+                    >
+
+                </div>
+
+
+                <!-- OTHER -->
+
+                <div class="form-group">
+
+                    <label>
+                        Other Expenses (₹)
+                    </label>
+
+                    <input
+                        type="number"
+                        name="other"
+                        placeholder="Example: 500"
+                        min="0"
+                        step="0.01"
+                        value="0"
+                    >
+
+                </div>
+
+
+            </div>
+
+
+            <!-- BUTTON -->
+
+            <button
+                type="submit"
+                class="calculate-button">
+
+                🔧 Calculate Maintenance Cost
+
+            </button>
+
+
+        </form>
+
+    </div>
+
+
+    <!-- =====================================
+         RESULT
+    ====================================== -->
+
+    {% if result is not none %}
+
+    <div class="result-box">
+
+        <h2>
+            Maintenance Cost
+        </h2>
+
+
+        <div class="total-card">
+
+            <span>
+                Total Maintenance Expense
+            </span>
+
+
+            <strong>
+
+                ₹{{ "{:,.2f}".format(result) }}
+
+            </strong>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- =====================================
+         INFORMATION
+    ====================================== -->
+
+    <div class="info-box">
+
+        <strong>
+            How it works:
+        </strong>
+
+        <br>
+
+        Enter the cost of service, engine oil, tyres
+        and other maintenance expenses.
+
+        The system adds all the expenses and displays
+        the total maintenance cost.
+
+    </div>
+
+
+</div>
+
+
+{% endblock %}
