@@ -5,411 +5,338 @@
 {% block content %}
 
 <style>
-
-.wrap {
-    width: 92%;
-    max-width: 1500px;
-    margin: auto;
-}
-
-/* ================= HEADER ================= */
-
-.head {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.head h1 {
-    color: #ff6600;
-    font-size: 42px;
-    margin-bottom: 8px;
-}
-
-.head p {
-    color: #bbb;
-    font-size: 17px;
-}
-
-/* ================= GRID ================= */
-
-.grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 22px;
-}
-
-/* ================= CARD ================= */
-
-.card {
-    background: #1b1b1b;
-    border: 1px solid #333;
-    border-radius: 14px;
-    overflow: hidden;
-    transition: 0.3s;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    border-color: #ff6600;
-    box-shadow: 0 8px 25px rgba(255, 102, 0, 0.15);
-}
-
-/* ================= PHOTO ================= */
-
-.photo {
-    height: 245px;
-    width: 100%;
-    background: #050505;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    overflow: hidden;
-}
-
-.photo img {
-    width: 100%;
-    height: 100%;
-
-    object-fit: contain;
-
-    display: block;
-}
-
-/* ================= NO PHOTO ================= */
-
-.no-photo {
-    height: 100%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    flex-direction: column;
-
-    color: #777;
-    font-size: 15px;
-}
-
-.bike-icon {
-    font-size: 55px;
-    margin-bottom: 8px;
-}
-
-/* ================= BODY ================= */
-
-.body {
-    padding: 20px;
-}
-
-.brand {
-    color: #ff6600;
-    font-weight: bold;
-    font-size: 16px;
-}
-
-.body h2 {
-    margin: 8px 0 14px;
-    color: white;
-    font-size: 25px;
-}
-
-/* ================= PRICE ================= */
-
-.price {
-    color: #00e676;
-    font-size: 23px;
-    font-weight: bold;
-
-    margin-bottom: 18px;
-}
-
-/* ================= SPECS ================= */
-
-.specs {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-}
-
-.specs span {
-    background: #252525;
-
-    padding: 10px;
-
-    border-radius: 7px;
-
-    color: #aaa;
-
-    font-size: 12px;
-}
-
-.specs b {
-    display: block;
-
-    color: white;
-
-    margin-top: 4px;
-
-    font-size: 14px;
-}
-
-/* ================= BUTTON ================= */
-
-.btn {
-    display: block;
-
-    text-align: center;
-
-    background: #ff6600;
-
-    color: white;
-
-    padding: 12px;
-
-    border-radius: 7px;
-
-    margin-top: 18px;
-
-    font-weight: bold;
-
-    text-decoration: none;
-
-    transition: 0.2s;
-}
-
-.btn:hover {
-    background: #e65c00;
-}
-
-/* ================= RESPONSIVE ================= */
-
-@media(max-width: 1100px) {
-
-    .grid {
-        grid-template-columns: repeat(2, 1fr);
+    .browse-wrap {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 35px 22px 60px;
     }
 
-}
-
-@media(max-width: 600px) {
-
-    .grid {
-        grid-template-columns: 1fr;
+    .browse-head {
+        text-align: center;
+        margin-bottom: 30px;
     }
 
-    .head h1 {
-        font-size: 32px;
+    .browse-head h1 {
+        margin: 0;
+        color: #ff6600;
+        font-size: 42px;
+        font-weight: 800;
     }
 
-}
+    .browse-head p {
+        margin: 10px 0 0;
+        color: #cfcfcf;
+        font-size: 18px;
+    }
 
+    .bike-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 26px;
+    }
+
+    .bike-card {
+        background: #191919;
+        border: 1px solid #303030;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .bike-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
+    }
+
+    .bike-photo {
+        width: 100%;
+        height: 265px;
+        background: #242424;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .bike-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .image-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #777;
+        font-size: 58px;
+    }
+
+    .bike-body {
+        padding: 20px 20px 22px;
+    }
+
+    .bike-brand {
+        color: #ff6600;
+        font-size: 17px;
+        font-weight: 800;
+        margin-bottom: 4px;
+    }
+
+    .bike-model {
+        color: #ffffff;
+        font-size: 29px;
+        font-weight: 800;
+        line-height: 1.15;
+        margin-bottom: 14px;
+    }
+
+    .bike-price {
+        color: #00ff75;
+        font-size: 27px;
+        font-weight: 800;
+        margin-bottom: 18px;
+    }
+
+    .spec-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+
+    .spec-box {
+        background: #252525;
+        border-radius: 10px;
+        padding: 12px 13px;
+    }
+
+    .spec-label {
+        color: #9e9e9e;
+        font-size: 12px;
+        margin-bottom: 3px;
+    }
+
+    .spec-value {
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .bike-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        flex: 1 1 180px;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 9px;
+        padding: 12px 15px;
+        font-weight: 800;
+        transition: opacity .2s ease, transform .2s ease;
+    }
+
+    .action-btn:hover {
+        opacity: .9;
+        transform: translateY(-1px);
+    }
+
+    .details-btn {
+        background: #ff6600;
+        color: #ffffff;
+    }
+
+    .test-btn {
+        background: #2d2d2d;
+        border: 1px solid #444;
+        color: #ffffff;
+    }
+
+    .empty-state {
+        text-align: center;
+        background: #191919;
+        border: 1px solid #303030;
+        border-radius: 16px;
+        padding: 45px 20px;
+        color: #cccccc;
+    }
+
+    @media (max-width: 900px) {
+        .bike-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .browse-wrap {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .browse-head h1 {
+            font-size: 32px;
+        }
+
+        .bike-photo {
+            height: 230px;
+        }
+
+        .bike-model {
+            font-size: 24px;
+        }
+    }
 </style>
 
+<div class="browse-wrap">
 
-<div class="wrap">
-
-    <!-- ================= PAGE HEADER ================= -->
-
-    <div class="head">
-
+    <div class="browse-head">
         <h1>🏍️ Browse Bikes</h1>
-
-        <p>
-            Find your perfect bike
-        </p>
-
+        <p>Find your perfect bike</p>
     </div>
 
+    {% if bikes %}
 
-    <!-- ================= BIKE GRID ================= -->
-
-    <div class="grid">
+    <div class="bike-grid" id="bikeGrid">
 
         {% for bike in bikes %}
 
-        <div class="card">
+        <div class="bike-card">
 
+            <div class="bike-photo">
 
-            <!-- =========================================
-                 BIKE PHOTO
-                 bike[-1] = image path added by Flask
-                 ========================================= -->
-
-            {% if bike[-1] %}
-
-            <div class="photo">
+                {% if bike[11] %}
 
                 <img
-                    src="{{ url_for('bike_image', filename=bike[-1]) }}"
+                    {% if loop.index <= 6 %}
+                    src="{{ url_for('bike_image', filename=bike[11]) }}"
+                    {% else %}
+                    src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                    data-src="{{ url_for('bike_image', filename=bike[11]) }}"
+                    {% endif %}
                     alt="{{ bike[1] }} {{ bike[2] }}"
-
-                    onerror="
-                        this.style.display='none';
-                        this.parentElement.innerHTML =
-                        '<div class=\'no-photo\'>' +
-                        '<div class=\'bike-icon\'>🏍️</div>' +
-                        'Photo unavailable' +
-                        '</div>';
-                    "
+                    width="800"
+                    height="530"
+                    decoding="async"
+                    {% if loop.index <= 6 %}fetchpriority="high"{% endif %}
+                    loading="{{ 'eager' if loop.index <= 6 else 'lazy' }}"
+                    class="bike-image lazy-bike-image"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                 >
 
-            </div>
+                <div class="image-placeholder" style="display:none;">🏍️</div>
 
-            {% else %}
+                {% else %}
 
-            <div class="photo no-photo">
+                <div class="image-placeholder">🏍️</div>
 
-                <div class="bike-icon">
-                    🏍️
-                </div>
-
-                Photo unavailable
+                {% endif %}
 
             </div>
 
-            {% endif %}
+            <div class="bike-body">
 
+                <div class="bike-brand">{{ bike[1] }}</div>
 
-            <!-- =========================================
-                 BIKE INFORMATION
-                 ========================================= -->
+                <div class="bike-model">{{ bike[2] }}</div>
 
-            <div class="body">
+                <div class="bike-price">₹{{ "{:,.0f}".format(bike[4]|float) }}</div>
 
+                <div class="spec-grid">
+                    <div class="spec-box">
+                        <div class="spec-label">Engine</div>
+                        <div class="spec-value">{{ bike[3] }} CC</div>
+                    </div>
 
-                <!-- BRAND -->
+                    <div class="spec-box">
+                        <div class="spec-label">Mileage</div>
+                        <div class="spec-value">{{ bike[5] }} km/l</div>
+                    </div>
 
-                <div class="brand">
-                    {{ bike[1] }}
+                    <div class="spec-box">
+                        <div class="spec-label">Power</div>
+                        <div class="spec-value">{{ bike[6] }} PS</div>
+                    </div>
+
+                    <div class="spec-box">
+                        <div class="spec-label">Torque</div>
+                        <div class="spec-value">{{ bike[7] }} Nm</div>
+                    </div>
                 </div>
 
+                <div class="bike-actions">
+                    <a
+                        class="action-btn details-btn"
+                        href="{{ url_for('bike_details', bike_id=bike[0]) }}"
+                    >
+                        View Details →
+                    </a>
 
-                <!-- MODEL -->
-
-                <h2>
-                    {{ bike[2] }}
-                </h2>
-
-
-                <!-- PRICE -->
-
-                <div class="price">
-
-                    ₹{{ "{:,.0f}".format(bike[4]|float) }}
-
+                    <a
+                        class="action-btn test-btn"
+                        href="{{ url_for('book_test_ride', bike_id=bike[0]) }}"
+                    >
+                        🏁 Test Ride
+                    </a>
                 </div>
-
-
-                <!-- =====================================
-                     SPECIFICATIONS
-                     ===================================== -->
-
-                <div class="specs">
-
-
-                    <!-- ENGINE -->
-
-                    <span>
-
-                        Engine
-
-                        <b>
-                            {{ bike[3] }} CC
-                        </b>
-
-                    </span>
-
-
-                    <!-- MILEAGE -->
-
-                    <span>
-
-                        Mileage
-
-                        <b>
-                            {{ bike[5] }} km/l
-                        </b>
-
-                    </span>
-
-
-                    <!-- POWER -->
-
-                    <span>
-
-                        Power
-
-                        <b>
-                            {{ bike[6] }}
-                        </b>
-
-                    </span>
-
-
-                    <!-- TORQUE -->
-
-                    <span>
-
-                        Torque
-
-                        <b>
-                            {{ bike[7] }}
-                        </b>
-
-                    </span>
-
-
-                    <!-- FUEL -->
-
-                    <span>
-
-                        Fuel
-
-                        <b>
-                            {{ bike[8] }} L
-                        </b>
-
-                    </span>
-
-
-                    <!-- AVAILABILITY -->
-
-                    <span>
-
-                        Availability
-
-                        <b>
-                            {{ bike[9] }}
-                        </b>
-
-                    </span>
-
-
-                </div>
-
-
-                <!-- =====================================
-                     VIEW DETAILS
-                     ===================================== -->
-
-                <a
-                    href="{{ url_for('bike_details', bike_id=bike[0]) }}"
-                    class="btn"
-                >
-                    View Details
-                </a>
-
 
             </div>
-
         </div>
 
         {% endfor %}
 
     </div>
 
+    {% else %}
+
+    <div class="empty-state">
+        <h2>No bikes found</h2>
+        <p>Please check again later.</p>
+    </div>
+
+    {% endif %}
+
 </div>
+
+<script>
+(function () {
+    const images = document.querySelectorAll('img[data-src]');
+
+    if (!images.length) return;
+
+    const loadImage = (img) => {
+        const source = img.getAttribute('data-src');
+        if (!source) return;
+        img.src = source;
+        img.removeAttribute('data-src');
+    };
+
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(
+            (entries, obs) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        loadImage(entry.target);
+                        obs.unobserve(entry.target);
+                    }
+                });
+            },
+            {
+                rootMargin: '500px 0px'
+            }
+        );
+
+        images.forEach((img) => observer.observe(img));
+    } else {
+        images.forEach(loadImage);
+    }
+})();
+</script>
 
 {% endblock %}
