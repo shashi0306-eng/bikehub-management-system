@@ -81,11 +81,7 @@ def get_db_connection():
         if ssl_ca:
 
             db_config["ssl_ca"] = ssl_ca
-
             db_config["ssl_verify_cert"] = True
-
-            # The CA certificate is verified. Hostname verification is
-            # disabled for compatibility with Aiven/MySQL deployments.
             db_config["ssl_verify_identity"] = False
 
         _db_pool = pooling.MySQLConnectionPool(
@@ -109,10 +105,6 @@ ALLOWED_IMAGE_EXTENSIONS = {
     ".webp"
 }
 
-
-# The image folder can contain hundreds of bike photos.
-# Build a small in-memory index once instead of scanning the
-# folders again for every bike and every image request.
 _image_roots_cache = None
 _image_index = None
 _primary_image_cache = {}
@@ -208,6 +200,7 @@ def build_image_index():
     for root in get_bike_image_roots():
 
         try:
+
             for current_root, directories, files in os.walk(root):
 
                 for filename in files:
@@ -232,9 +225,6 @@ def build_image_index():
                         "/"
                     )
 
-                    relative_key = relative_path.lower().lstrip("/")
-                    basename_key = filename.lower()
-
                     entry = (
                         root,
                         relative_path,
@@ -242,12 +232,12 @@ def build_image_index():
                     )
 
                     relative_map.setdefault(
-                        relative_key,
+                        relative_path.lower().lstrip("/"),
                         entry
                     )
 
                     basename_map.setdefault(
-                        basename_key,
+                        filename.lower(),
                         entry
                     )
 
@@ -291,7 +281,6 @@ def find_image_file(filename):
     if not filename:
         return None
 
-    # Fast direct lookup first.
     for root in get_bike_image_roots():
 
         direct_path = os.path.join(
@@ -305,7 +294,6 @@ def find_image_file(filename):
                 filename
             )
 
-    # Then use the one-time in-memory index.
     index = build_image_index()
 
     entry = index["relative"].get(
@@ -335,16 +323,79 @@ def find_image_file(filename):
 # GET PRIMARY BIKE IMAGE
 # =========================================================
 
+def find_image_file(filename):
+
+    if not filename:
+        return None
+
+    filename = str(filename).replace(
+        "\\",
+        "/"
+    ).lstrip("/")
+
+    for root in get_bike_image_roots():
+
+        # -------------------------------------------------
+        # Direct path
+        # -------------------------------------------------
+
+        direct_path = os.path.join(
+            root,
+            filename
+        )
+
+        if os.path.isfile(direct_path):
+            return (
+                root,
+                filename
+            )
+
+        # -------------------------------------------------
+        # Recursive search
+        # -------------------------------------------------
+
+        target_name = os.path.basename(
+            filename
+        ).lower()
+
+        for current_root, directories, files in os.walk(root):
+
+            for current_file in files:
+
+                if current_file.lower() == target_name:
+
+                    relative_path = os.path.relpath(
+                        os.path.join(
+                            current_root,
+                            current_file
+                        ),
+                        root
+                    )
+
+                    relative_path = relative_path.replace(
+                        "\\",
+                        "/"
+                    )
+
+                    return (
+                        root,
+                        relative_path
+                    )
+
+    return None
+
+
+# =========================================================
+# GET PRIMARY BIKE IMAGE
+# =========================================================
+
 def get_primary_bike_image(
     bike_id,
     brand=None,
     model=None
 ):
 
-    """
-    Finds the first image for a bike without opening a database
-    connection or scanning the image folders repeatedly.
-    """
+    """Find the first available image for a bike using the cached index."""
 
     try:
         bike_id = int(bike_id)
@@ -365,10 +416,7 @@ def get_primary_bike_image(
 
     index = build_image_index()
 
-    # -----------------------------------------------------
-    # 1. CURRENT FLAT FORMAT
-    # -----------------------------------------------------
-
+    # 1. Current flat upload format: bike_12_1.jpg
     current_prefix = f"bike_{bike_id}_".lower()
 
     current_candidates = [
@@ -390,32 +438,14 @@ def get_primary_bike_image(
         _primary_image_cache[cache_key] = result
         return result
 
-    # -----------------------------------------------------
-    # 2. OLD FOLDER FORMAT
-    # -----------------------------------------------------
+    # 2. Old folder format: 001_KTM_125_Duke/file.jpg
+    if brand is not None and model is not None:
 
-    if (
-        brand is not None
-        and model is not None
-    ):
-
-        brand_clean = clean_folder_name(
-            brand
-        )
-
-        model_clean = clean_folder_name(
-            model
-        )
-
-        folder_name = (
-            f"{bike_id:03d}_"
-            f"{brand_clean}_"
-            f"{model_clean}"
-        )
+        brand_clean = clean_folder_name(brand)
+        model_clean = clean_folder_name(model)
 
         folder_prefix = (
-            folder_name
-            + "/"
+            f"{bike_id:03d}_{brand_clean}_{model_clean}/"
         ).lower()
 
         folder_candidates = [
@@ -437,23 +467,9 @@ def get_primary_bike_image(
             _primary_image_cache[cache_key] = result
             return result
 
-    # -----------------------------------------------------
-    # 3. OLD FLAT FILE NAMES
-    # -----------------------------------------------------
-
-    if brand is not None:
-        brand_clean = clean_folder_name(
-            brand
-        )
-    else:
-        brand_clean = ""
-
-    if model is not None:
-        model_clean = clean_folder_name(
-            model
-        )
-    else:
-        model_clean = ""
+    # 3. Older flat naming formats
+    brand_clean = clean_folder_name(brand) if brand is not None else ""
+    model_clean = clean_folder_name(model) if model is not None else ""
 
     if brand_clean and model_clean:
 
@@ -470,19 +486,15 @@ def get_primary_bike_image(
 
         for filename in possible_names:
 
-            result = find_image_file(
-                filename
-            )
+            entry = find_image_file(filename)
 
-            if result:
+            if entry:
 
-                _primary_image_cache[cache_key] = result[1]
-                return result[1]
+                result = entry[1]
+                _primary_image_cache[cache_key] = result
+                return result
 
-    # -----------------------------------------------------
-    # 4. GENERIC SEARCH BY BIKE ID
-    # -----------------------------------------------------
-
+    # 4. Generic ID-prefixed image search
     prefixes = (
         f"{bike_id}_".lower(),
         f"{bike_id:03d}_".lower(),
@@ -499,6 +511,7 @@ def get_primary_bike_image(
 
         generic_candidates.sort(
             key=lambda item: (
+                _image_number_from_filename(item[2]),
                 item[2].lower(),
                 item[1].lower()
             )
@@ -2152,13 +2165,7 @@ def bike_image(
     filename
 ):
 
-    """
-    Fast image serving for both new and old image names.
-    The image index is built once and reused for subsequent
-    requests, avoiding a full os.walk() for every image.
-    """
-
-    filename = filename.replace(
+    filename = str(filename).replace(
         "\\",
         "/"
     ).lstrip("/")
@@ -2169,20 +2176,11 @@ def bike_image(
 
     if result:
 
-        image_root = result[0]
-        relative_path = result[1]
-
-        response = send_from_directory(
-            image_root,
-            relative_path,
-            max_age=86400,
-            conditional=True
+        return send_from_directory(
+            result[0],
+            result[1],
+            max_age=86400
         )
-
-        response.cache_control.public = True
-        response.cache_control.max_age = 86400
-
-        return response
 
     return (
         "Image not found: "
@@ -2275,7 +2273,8 @@ def bike_recommendation_image(
 
         return send_from_directory(
             result[0],
-            result[1]
+            result[1],
+            max_age=86400
         )
 
 
@@ -2797,8 +2796,6 @@ def admin_bike_images(
 
         conn.commit()
 
-        clear_image_cache()
-
         cursor.close()
         conn.close()
 
@@ -2929,7 +2926,9 @@ def delete_bike_image(
         except OSError:
             pass
 
+
     clear_image_cache()
+
 
     return redirect(
         url_for(
@@ -3735,7 +3734,9 @@ def delete_bike(
             except OSError:
                 pass
 
+
     clear_image_cache()
+
 
     return redirect(
         url_for(
@@ -3774,7 +3775,7 @@ def admin_users():
             mobile,
             email
         FROM users
-        ORDER BY id DESC
+        ORDER BY id ASC
         """
     )
 
