@@ -9,6 +9,7 @@ from flask import (
 )
 
 import mysql.connector
+from mysql.connector import pooling
 import os
 import re
 
@@ -34,13 +35,67 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY")
 # DATABASE CONNECTION
 # =========================================================
 
+_db_pool = None
+
+
 def get_db_connection():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password=os.getenv("MYSQL_PASSWORD"),
-        database="bikehub"
-    )
+
+    global _db_pool
+
+    if _db_pool is None:
+
+        db_config = {
+            "host": os.getenv(
+                "MYSQL_HOST",
+                "localhost"
+            ),
+
+            "port": int(
+                os.getenv(
+                    "MYSQL_PORT",
+                    "3306"
+                )
+            ),
+
+            "user": os.getenv(
+                "MYSQL_USER",
+                "root"
+            ),
+
+            "password": os.getenv(
+                "MYSQL_PASSWORD"
+            ),
+
+            "database": os.getenv(
+                "MYSQL_DATABASE",
+                "bikehub"
+            ),
+
+            "connection_timeout": 20
+        }
+
+        ssl_ca = os.getenv(
+            "MYSQL_SSL_CA"
+        )
+
+        if ssl_ca:
+
+            db_config["ssl_ca"] = ssl_ca
+
+            db_config["ssl_verify_cert"] = True
+
+            # The CA certificate is verified. Hostname verification is
+            # disabled for compatibility with Aiven/MySQL deployments.
+            db_config["ssl_verify_identity"] = False
+
+        _db_pool = pooling.MySQLConnectionPool(
+            pool_name="bikehub_pool",
+            pool_size=5,
+            pool_reset_session=True,
+            **db_config
+        )
+
+    return _db_pool.get_connection()
 
 
 # =========================================================
@@ -218,43 +273,12 @@ def get_primary_bike_image(
     # =====================================================
     # 1. DATABASE IMAGE
     # =====================================================
-
-    try:
-
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        cursor.execute(
-            """
-            SELECT
-                image_name
-            FROM bike_images
-            WHERE bike_id = %s
-            ORDER BY
-                display_order,
-                id
-            LIMIT 1
-            """,
-            (bike_id,)
-        )
-
-        image = cursor.fetchone()
-
-        cursor.close()
-        conn.close()
-
-        if image and image[0]:
-
-            result = find_image_file(
-                image[0]
-            )
-
-            if result:
-
-                return result[1]
-
-    except mysql.connector.Error:
-        pass
+    #
+    # Do not query MySQL here.
+    # /bikes and /search can process many bikes, and opening
+    # a database connection for every bike can exhaust the
+    # available Aiven connections. Image lookup is handled by
+    # the filesystem formats below.
 
 
     # =====================================================
@@ -3828,7 +3852,7 @@ def delete_bike(
 
 
 # =========================================================
-# ADMIN DELETE USER
+# ADMIN - DELETE USER
 # =========================================================
 
 @app.route(
@@ -3840,19 +3864,17 @@ def delete_user(user_id):
     if "admin_id" not in session:
 
         return redirect(
-            url_for(
-                "admin_login"
-            )
+            url_for("admin_login")
         )
 
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
+
     try:
 
-        # Remove records belonging to this user first so that
-        # foreign-key references do not block user deletion.
+        # Delete dependent records first.
         cursor.execute(
             """
             DELETE FROM test_rides
@@ -3869,6 +3891,7 @@ def delete_user(user_id):
             (user_id,)
         )
 
+        # Delete the registered user.
         cursor.execute(
             """
             DELETE FROM users
@@ -3882,18 +3905,17 @@ def delete_user(user_id):
     except mysql.connector.Error:
 
         conn.rollback()
-        raise
-
-    finally:
 
         cursor.close()
         conn.close()
 
+        return "Unable to delete user." , 500
+
+    cursor.close()
+    conn.close()
 
     return redirect(
-        url_for(
-            "admin_users"
-        )
+        url_for("admin_users")
     )
 
 
@@ -3909,9 +3931,7 @@ def admin_users():
     if "admin_id" not in session:
 
         return redirect(
-            url_for(
-                "admin_login"
-            )
+            url_for("admin_login")
         )
 
 
