@@ -9,6 +9,7 @@ from flask import (
 )
 
 import mysql.connector
+from mysql.connector import pooling
 import os
 import re
 
@@ -34,25 +35,67 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY")
 # DATABASE CONNECTION
 # =========================================================
 
+_db_pool = None
+
+
 def get_db_connection():
 
-    db_config = {
-        "host": os.getenv("MYSQL_HOST", "localhost"),
-        "port": int(os.getenv("MYSQL_PORT", "3306")),
-        "user": os.getenv("MYSQL_USER", "root"),
-        "password": os.getenv("MYSQL_PASSWORD"),
-        "database": os.getenv("MYSQL_DATABASE", "bikehub")
-    }
+    global _db_pool
 
-    ssl_ca = os.getenv("MYSQL_SSL_CA")
+    if _db_pool is None:
 
-    if ssl_ca:
-        db_config["ssl_ca"] = ssl_ca
-        db_config["ssl_verify_cert"] = True
-        db_config["ssl_verify_identity"] = True
+        db_config = {
+            "host": os.getenv(
+                "MYSQL_HOST",
+                "localhost"
+            ),
 
-    return mysql.connector.connect(**db_config)
-    
+            "port": int(
+                os.getenv(
+                    "MYSQL_PORT",
+                    "3306"
+                )
+            ),
+
+            "user": os.getenv(
+                "MYSQL_USER",
+                "root"
+            ),
+
+            "password": os.getenv(
+                "MYSQL_PASSWORD"
+            ),
+
+            "database": os.getenv(
+                "MYSQL_DATABASE",
+                "bikehub"
+            ),
+
+            "connection_timeout": 20
+        }
+
+        ssl_ca = os.getenv(
+            "MYSQL_SSL_CA"
+        )
+
+        if ssl_ca:
+
+            db_config["ssl_ca"] = ssl_ca
+
+            db_config["ssl_verify_cert"] = True
+
+            # The CA certificate is verified. Hostname verification is
+            # disabled for compatibility with Aiven/MySQL deployments.
+            db_config["ssl_verify_identity"] = False
+
+        _db_pool = pooling.MySQLConnectionPool(
+            pool_name="bikehub_pool",
+            pool_size=5,
+            pool_reset_session=True,
+            **db_config
+        )
+
+    return _db_pool.get_connection()
 
 
 # =========================================================
@@ -230,43 +273,12 @@ def get_primary_bike_image(
     # =====================================================
     # 1. DATABASE IMAGE
     # =====================================================
-
-    try:
-
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        cursor.execute(
-            """
-            SELECT
-                image_name
-            FROM bike_images
-            WHERE bike_id = %s
-            ORDER BY
-                display_order,
-                id
-            LIMIT 1
-            """,
-            (bike_id,)
-        )
-
-        image = cursor.fetchone()
-
-        cursor.close()
-        conn.close()
-
-        if image and image[0]:
-
-            result = find_image_file(
-                image[0]
-            )
-
-            if result:
-
-                return result[1]
-
-    except mysql.connector.Error:
-        pass
+    #
+    # Do not query MySQL here.
+    # /bikes and /search can process many bikes, and opening
+    # a database connection for every bike can exhaust the
+    # available Aiven connections. Image lookup is handled by
+    # the filesystem formats below.
 
 
     # =====================================================
