@@ -1,84 +1,79 @@
 {% extends "admin_base.html" %}
 
 {% block title %}
-Manage Users - BikeHub
+Users - BikeHub Admin
 {% endblock %}
 
-{% block extra_css %}
+{% block content %}
 
 <style>
 
-/* =========================================================
-   MANAGE USERS PAGE
-========================================================= */
-
 .users-page{
-    width:100%;
-    padding:35px 25px 55px;
-    box-sizing:border-box;
+    min-height:calc(100vh - 90px);
+    padding:40px 22px 60px;
+    background:
+        radial-gradient(
+            circle at 15% 10%,
+            rgba(255,102,0,.12),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 85% 90%,
+            rgba(255,102,0,.08),
+            transparent 30%
+        ),
+        #0b0b0d;
 }
 
-/* =========================================================
-   HERO
-========================================================= */
+.users-container{
+    width:min(1250px,100%);
+    margin:auto;
+}
 
-.users-hero{
-    display:flex;
-    align-items:flex-end;
-    justify-content:space-between;
-    gap:20px;
+.users-header{
+    text-align:center;
     margin-bottom:28px;
 }
 
-.users-hero-left h1{
+.users-header h1{
     margin:0;
-    color:#ffffff;
-    font-size:42px;
-    font-weight:900;
-    letter-spacing:-1px;
+    color:#fff;
+    font-size:38px;
 }
 
-.users-hero-left h1 span{
-    color:#ff6600;
+.users-header h1 span{
+    color:#ff6900;
 }
 
-.users-hero-left p{
-    margin:8px 0 0;
-    color:#8f8f99;
+.users-header p{
+    margin-top:9px;
+    color:#9a9aa5;
     font-size:15px;
 }
 
-.hero-badge{
-    display:inline-flex;
-    align-items:center;
-    gap:9px;
-    padding:13px 18px;
-    border-radius:14px;
-    background:linear-gradient(
-        135deg,
-        #ff7a00,
-        #ff5200
-    );
-    color:#ffffff;
-    font-weight:800;
-    box-shadow:0 12px 30px rgba(255,102,0,.22);
-    white-space:nowrap;
-}
-
-/* =========================================================
-   SEARCH
-========================================================= */
-
-.users-toolbar{
-    display:flex;
-    align-items:center;
-    gap:14px;
-    margin-bottom:22px;
-}
-
 .search-box{
+    max-width:620px;
+    margin:0 auto 28px;
     position:relative;
-    flex:1;
+}
+
+.search-box input{
+    width:100%;
+    box-sizing:border-box;
+    padding:15px 18px 15px 48px;
+    background:#141418;
+    color:#fff;
+    border:1px solid #34343d;
+    border-radius:14px;
+    outline:none;
+    font-size:14px;
+    transition:.2s;
+}
+
+.search-box input:focus{
+    border-color:#ff6900;
+    box-shadow:
+        0 0 0 4px rgba(255,102,0,.10);
 }
 
 .search-icon{
@@ -86,43 +81,16 @@ Manage Users - BikeHub
     left:17px;
     top:50%;
     transform:translateY(-50%);
+    color:#858590;
     font-size:18px;
-    opacity:.65;
-    pointer-events:none;
 }
-
-.search-box input{
-    width:100%;
-    box-sizing:border-box;
-    padding:16px 18px 16px 48px;
-    border-radius:14px;
-    border:1px solid #34343b;
-    outline:none;
-    background:#151518;
-    color:#ffffff;
-    font-size:15px;
-    transition:.2s;
-}
-
-.search-box input::placeholder{
-    color:#777782;
-}
-
-.search-box input:focus{
-    border-color:#ff6600;
-    box-shadow:0 0 0 4px rgba(255,102,0,.10);
-}
-
-/* =========================================================
-   TABLE
-========================================================= */
 
 .users-table-card{
-    background:#141416;
-    border:1px solid #2e2e34;
-    border-radius:20px;
+    background:rgba(20,20,24,.95);
+    border:1px solid rgba(255,102,0,.18);
+    border-radius:22px;
     overflow:hidden;
-    box-shadow:0 18px 55px rgba(0,0,0,.28);
+    box-shadow:0 22px 60px rgba(0,0,0,.45);
 }
 
 .users-table-wrap{
@@ -131,235 +99,175 @@ Manage Users - BikeHub
 
 .users-table{
     width:100%;
-    min-width:850px;
+    min-width:900px;
     border-collapse:collapse;
 }
 
-.users-table thead{
-    background:#1d1d20;
-}
-
-.users-table th{
-    padding:17px 18px;
-    text-align:left;
-    color:#f6f6f7;
+.users-table thead th{
+    padding:17px 14px;
+    background:#17171b;
+    color:#ff6900;
+    border-bottom:1px solid #303039;
     font-size:13px;
-    font-weight:800;
-    border-bottom:1px solid #333339;
-    white-space:nowrap;
+    text-transform:uppercase;
+    letter-spacing:.5px;
 }
 
-.users-table th:first-child{
-    color:#ff6600;
-    width:80px;
-}
-
-.users-table tbody tr{
-    background:#141416;
-    transition:.18s;
-}
-
-.users-table tbody tr:nth-child(even){
-    background:#18181b;
-}
-
-.users-table tbody tr:hover{
-    background:#202024;
-}
-
-.users-table td{
-    padding:17px 18px;
-    color:#dcdce2;
-    font-size:14px;
-    border-bottom:1px solid #28282d;
+.users-table tbody td{
+    padding:17px 14px;
+    text-align:center;
+    border-bottom:1px solid #25252c;
+    color:#ddd;
     vertical-align:middle;
 }
 
-.users-table tbody tr:last-child td{
-    border-bottom:0;
+.users-table tbody tr{
+    transition:.2s;
 }
 
-/* =========================================================
-   SERIAL NUMBER
-========================================================= */
+.users-table tbody tr:hover{
+    background:rgba(255,102,0,.05);
+}
 
 .serial{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    width:36px;
-    height:36px;
-    border-radius:11px;
-    background:rgba(255,102,0,.12);
-    border:1px solid rgba(255,102,0,.24);
-    color:#ff7a00;
-    font-weight:900;
+    display:inline-grid;
+    place-items:center;
+    width:34px;
+    height:34px;
+    border-radius:10px;
+    background:#201914;
+    color:#ff6900;
+    font-weight:800;
+    border:1px solid rgba(255,102,0,.25);
 }
 
-/* =========================================================
-   USER
-========================================================= */
-
 .user-name{
-    color:#ffffff;
-    font-weight:800;
+    display:block;
+    color:#fff;
+    font-weight:700;
 }
 
 .user-id{
     display:block;
-    margin-top:4px;
-    color:#676770;
+    margin-top:5px;
+    color:#73737e;
     font-size:11px;
 }
 
 .mobile-number{
-    color:#c4c4cc;
-    font-family:Consolas,monospace;
+    color:#ddd;
 }
 
 .email{
-    color:#cfcfd7;
-    word-break:break-word;
+    color:#bdbdc6;
 }
-
-/* =========================================================
-   STATUS
-========================================================= */
 
 .status{
     display:inline-flex;
     align-items:center;
     gap:7px;
-    padding:8px 12px;
+    padding:7px 11px;
     border-radius:999px;
-    background:rgba(52,211,153,.10);
-    border:1px solid rgba(52,211,153,.20);
-    color:#63e6b4;
+    background:#121e16;
+    border:1px solid #27452f;
+    color:#73dc8a;
     font-size:12px;
-    font-weight:800;
+    font-weight:700;
 }
 
 .status-dot{
     width:7px;
     height:7px;
     border-radius:50%;
-    background:#35d39a;
-    box-shadow:0 0 10px rgba(53,211,154,.55);
+    background:#43d76d;
 }
 
-/* =========================================================
-   EMPTY
-========================================================= */
-
-.empty-state{
-    text-align:center;
-    padding:55px 20px;
-    color:#777782;
+.delete-btn{
+    border:0;
+    border-radius:10px;
+    padding:10px 14px;
+    background:#321719;
+    border:1px solid #6c3034;
+    color:#ff9b9f;
+    font-weight:800;
+    cursor:pointer;
+    transition:.2s;
 }
 
-.empty-icon{
-    font-size:42px;
-    margin-bottom:12px;
+.delete-btn:hover{
+    background:#4a1b1f;
+    transform:translateY(-1px);
 }
-
-.empty-state strong{
-    display:block;
-    color:#ffffff;
-    font-size:18px;
-    margin-bottom:6px;
-}
-
-/* =========================================================
-   FOOTER
-========================================================= */
 
 .users-footer{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    gap:15px;
-    padding:15px 18px;
-    border-top:1px solid #2c2c31;
-    background:#111114;
-    color:#777782;
-    font-size:12px;
+    gap:20px;
+    padding:17px 20px;
+    color:#858590;
+    font-size:13px;
 }
 
 .users-footer strong{
-    color:#ffffff;
+    color:#ff6900;
 }
 
-/* =========================================================
-   RESPONSIVE
-========================================================= */
+.empty-state{
+    padding:50px 20px;
+    text-align:center;
+    color:#888894;
+}
 
-@media(max-width:800px){
+.empty-icon{
+    font-size:38px;
+    margin-bottom:12px;
+}
+
+.empty-state strong{
+    display:block;
+    color:#fff;
+    font-size:18px;
+    margin-bottom:7px;
+}
+
+@media(max-width:700px){
+
+    .users-header h1{
+        font-size:30px;
+    }
 
     .users-page{
-        padding:25px 14px 40px;
+        padding:28px 14px 45px;
     }
 
-    .users-hero{
-        align-items:flex-start;
+    .users-footer{
         flex-direction:column;
-    }
-
-    .users-hero-left h1{
-        font-size:32px;
-    }
-
-    .hero-badge{
-        width:100%;
-        justify-content:center;
-        box-sizing:border-box;
+        align-items:flex-start;
     }
 }
 
 </style>
 
-{% endblock %}
-
-
-{% block content %}
 
 <div class="users-page">
 
-    <!-- =====================================================
-         HERO
-    ====================================================== -->
+    <div class="users-container">
 
-    <section class="users-hero">
-
-        <div class="users-hero-left">
+        <div class="users-header">
 
             <h1>
-                👥 Manage <span>Users</span>
+                👥 Registered <span>Users</span>
             </h1>
 
             <p>
-                View and manage registered BikeHub users
+                Manage all registered BikeHub users
             </p>
 
         </div>
 
-        <div class="hero-badge">
 
-            👤 Total Users:
-
-            <span id="totalUsers">
-                {{ users|length }}
-            </span>
-
-        </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         SEARCH
-    ====================================================== -->
-
-    <div class="users-toolbar">
+        <!-- SEARCH -->
 
         <div class="search-box">
 
@@ -376,162 +284,186 @@ Manage Users - BikeHub
 
         </div>
 
-    </div>
+
+        <!-- USERS TABLE -->
+
+        <section class="users-table-card">
+
+            <div class="users-table-wrap">
+
+                <table class="users-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>#</th>
+
+                            <th>Name</th>
+
+                            <th>Mobile</th>
+
+                            <th>Email</th>
+
+                            <th>Status</th>
+
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
 
 
-    <!-- =====================================================
-         TABLE
-    ====================================================== -->
+                    <tbody id="usersBody">
 
-    <section class="users-table-card">
+                        {% for user in users %}
 
-        <div class="users-table-wrap">
+                        <tr class="user-row">
 
-            <table class="users-table">
+                            <!-- SERIAL NUMBER -->
 
-                <thead>
+                            <td>
 
-                    <tr>
-
-                        <th>#</th>
-
-                        <th>Name</th>
-
-                        <th>Mobile</th>
-
-                        <th>Email</th>
-
-                        <th>Status</th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody id="usersBody">
-
-                    {% for user in users %}
-
-                    <tr class="user-row">
-
-                        <!-- Display serial number -->
-                        <td>
-
-                            <span class="serial">
-                                {{ loop.index }}
-                            </span>
-
-                        </td>
-
-
-                        <!-- User name -->
-                        <td>
-
-                            <span class="user-name">
-                                {{ user[1] }}
-                            </span>
-
-                            <span class="user-id">
-                                Database ID: #{{ user[0] }}
-                            </span>
-
-                        </td>
-
-
-                        <!-- Mobile -->
-                        <td>
-
-                            <span class="mobile-number">
-                                {{ user[2] }}
-                            </span>
-
-                        </td>
-
-
-                        <!-- Email -->
-                        <td>
-
-                            <span class="email">
-                                {{ user[3] }}
-                            </span>
-
-                        </td>
-
-
-                        <!-- Status -->
-                        <td>
-
-                            <span class="status">
-
-                                <span class="status-dot"></span>
-
-                                Active
-
-                            </span>
-
-                        </td>
-
-                    </tr>
-
-                    {% endfor %}
-
-
-                    <tr
-                        id="noUsersRow"
-                        style="display:none;"
-                    >
-
-                        <td colspan="5">
-
-                            <div class="empty-state">
-
-                                <div class="empty-icon">
-                                    🔍
-                                </div>
-
-                                <strong>
-                                    No users found
-                                </strong>
-
-                                <span>
-                                    Try a different name, mobile number or email.
+                                <span class="serial">
+                                    {{ loop.index }}
                                 </span>
 
-                            </div>
-
-                        </td>
-
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-        </div>
+                            </td>
 
 
-        <div class="users-footer">
+                            <!-- NAME -->
 
-            <span>
+                            <td>
 
-                Showing
+                                <span class="user-name">
+                                    {{ user[1] }}
+                                </span>
 
-                <strong id="visibleUsers">
-                    {{ users|length }}
-                </strong>
+                                <span class="user-id">
+                                    Database ID: #{{ user[0] }}
+                                </span>
 
-                user(s)
-
-            </span>
+                            </td>
 
 
-            <span>
-                BikeHub User Management
-            </span>
+                            <!-- MOBILE -->
 
-        </div>
+                            <td>
 
-    </section>
+                                <span class="mobile-number">
+                                    {{ user[2] }}
+                                </span>
+
+                            </td>
+
+
+                            <!-- EMAIL -->
+
+                            <td>
+
+                                <span class="email">
+                                    {{ user[3] }}
+                                </span>
+
+                            </td>
+
+
+                            <!-- STATUS -->
+
+                            <td>
+
+                                <span class="status">
+
+                                    <span class="status-dot"></span>
+
+                                    Active
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- DELETE -->
+
+                            <td>
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for('delete_user', user_id=user[0]) }}"
+                                    onsubmit="return confirm('Are you sure you want to delete this user? This will also remove their test ride bookings and customer doubts.');"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="delete-btn"
+                                    >
+                                        🗑 Delete
+                                    </button>
+
+                                </form>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+
+                        <tr
+                            id="noUsersRow"
+                            style="display:none;"
+                        >
+
+                            <td colspan="6">
+
+                                <div class="empty-state">
+
+                                    <div class="empty-icon">
+                                        🔍
+                                    </div>
+
+                                    <strong>
+                                        No users found
+                                    </strong>
+
+                                    <span>
+                                        Try a different name, mobile number or email.
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- FOOTER -->
+
+            <div class="users-footer">
+
+                <span>
+                    Showing
+                    <strong id="visibleUsers">
+                        {{ users|length }}
+                    </strong>
+                    user(s)
+                </span>
+
+                <span>
+                    BikeHub User Management
+                </span>
+
+            </div>
+
+        </section>
+
+    </div>
 
 </div>
 
@@ -567,18 +499,19 @@ Manage Users - BikeHub
 
         rows.forEach(function(row){
 
-            const text =
-                row.textContent.toLowerCase();
-
             const match =
-                text.includes(value);
+                row.textContent
+                    .toLowerCase()
+                    .includes(value);
 
             row.style.display =
                 match ? "" : "none";
 
 
             if(match){
+
                 visible++;
+
             }
 
         });

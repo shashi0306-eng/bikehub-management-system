@@ -9,7 +9,6 @@ from flask import (
 )
 
 import mysql.connector
-from mysql.connector import pooling
 import os
 import re
 
@@ -35,91 +34,18 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY")
 # DATABASE CONNECTION
 # =========================================================
 
-_db_pool = None
-
-
 def get_db_connection():
-
-    global _db_pool
-
-    if _db_pool is None:
-
-        db_config = {
-            "host": os.getenv(
-                "MYSQL_HOST",
-                "localhost"
-            ),
-
-            "port": int(
-                os.getenv(
-                    "MYSQL_PORT",
-                    "3306"
-                )
-            ),
-
-            "user": os.getenv(
-                "MYSQL_USER",
-                "root"
-            ),
-
-            "password": os.getenv(
-                "MYSQL_PASSWORD"
-            ),
-
-            "database": os.getenv(
-                "MYSQL_DATABASE",
-                "bikehub"
-            ),
-
-            "connection_timeout": 20
-        }
-
-        ssl_ca = os.getenv(
-            "MYSQL_SSL_CA"
-        )
-
-        if ssl_ca:
-
-            db_config["ssl_ca"] = ssl_ca
-            db_config["ssl_verify_cert"] = True
-            db_config["ssl_verify_identity"] = False
-
-        _db_pool = pooling.MySQLConnectionPool(
-            pool_name="bikehub_pool",
-            pool_size=5,
-            pool_reset_session=True,
-            **db_config
-        )
-
-    return _db_pool.get_connection()
+    return mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password=os.getenv("MYSQL_PASSWORD"),
+        database="bikehub"
+    )
 
 
 # =========================================================
 # IMAGE HELPERS
 # =========================================================
-
-ALLOWED_IMAGE_EXTENSIONS = {
-    ".jpg",
-    ".jpeg",
-    ".png",
-    ".webp"
-}
-
-_image_roots_cache = None
-_image_index = None
-_primary_image_cache = {}
-
-
-def clear_image_cache():
-
-    global _image_roots_cache
-    global _image_index
-    global _primary_image_cache
-
-    _image_roots_cache = None
-    _image_index = None
-    _primary_image_cache.clear()
-
 
 def clean_folder_name(text):
     text = str(text).strip()
@@ -149,11 +75,21 @@ def clean_folder_name(text):
 
 def get_bike_image_roots():
 
-    global _image_roots_cache
+    roots = [
+        os.path.join(
+            app.root_path,
+            "images"
+        ),
 
-    if _image_roots_cache is not None:
-        return _image_roots_cache
+        os.path.join(
+            app.root_path,
+            "static",
+            "images"
+        )
+    ]
 
+    # Return existing folders.
+    # Also create /images automatically.
     main_images = os.path.join(
         app.root_path,
         "images"
@@ -164,163 +100,17 @@ def get_bike_image_roots():
         exist_ok=True
     )
 
-    roots = [
-        main_images,
-        os.path.join(
-            app.root_path,
-            "static",
-            "images"
-        )
-    ]
+    result = []
 
-    _image_roots_cache = [
-        root
-        for root in roots
-        if os.path.isdir(root)
-    ]
+    for root in roots:
+        if os.path.isdir(root):
+            result.append(root)
 
-    return _image_roots_cache
-
-
-# =========================================================
-# BUILD IMAGE INDEX ONCE
-# =========================================================
-
-def build_image_index():
-
-    global _image_index
-
-    if _image_index is not None:
-        return _image_index
-
-    relative_map = {}
-    basename_map = {}
-    all_files = []
-
-    for root in get_bike_image_roots():
-
-        try:
-
-            for current_root, directories, files in os.walk(root):
-
-                for filename in files:
-
-                    extension = os.path.splitext(
-                        filename
-                    )[1].lower()
-
-                    if extension not in ALLOWED_IMAGE_EXTENSIONS:
-                        continue
-
-                    full_path = os.path.join(
-                        current_root,
-                        filename
-                    )
-
-                    relative_path = os.path.relpath(
-                        full_path,
-                        root
-                    ).replace(
-                        "\\",
-                        "/"
-                    )
-
-                    entry = (
-                        root,
-                        relative_path,
-                        filename
-                    )
-
-                    relative_map.setdefault(
-                        relative_path.lower().lstrip("/"),
-                        entry
-                    )
-
-                    basename_map.setdefault(
-                        filename.lower(),
-                        entry
-                    )
-
-                    all_files.append(
-                        entry
-                    )
-
-        except OSError:
-            continue
-
-    all_files.sort(
-        key=lambda item: (
-            item[2].lower(),
-            item[1].lower()
-        )
-    )
-
-    _image_index = {
-        "relative": relative_map,
-        "basename": basename_map,
-        "all": all_files
-    }
-
-    return _image_index
+    return result
 
 
 # =========================================================
 # FIND FILE INSIDE IMAGE ROOT
-# =========================================================
-
-def find_image_file(filename):
-
-    if not filename:
-        return None
-
-    filename = str(filename).replace(
-        "\\",
-        "/"
-    ).lstrip("/")
-
-    if not filename:
-        return None
-
-    for root in get_bike_image_roots():
-
-        direct_path = os.path.join(
-            root,
-            filename
-        )
-
-        if os.path.isfile(direct_path):
-            return (
-                root,
-                filename
-            )
-
-    index = build_image_index()
-
-    entry = index["relative"].get(
-        filename.lower()
-    )
-
-    if entry:
-        return (
-            entry[0],
-            entry[1]
-        )
-
-    entry = index["basename"].get(
-        os.path.basename(filename).lower()
-    )
-
-    if entry:
-        return (
-            entry[0],
-            entry[1]
-        )
-
-    return None
-
-
-# =========================================================
-# GET PRIMARY BIKE IMAGE
 # =========================================================
 
 def find_image_file(filename):
@@ -395,7 +185,26 @@ def get_primary_bike_image(
     model=None
 ):
 
-    """Find the first available image for a bike using the cached index."""
+    """
+    Finds the first image for a bike.
+
+    Supported formats:
+
+    1. Database upload:
+       images/bike_4_1.jpg
+       images/bike_4_2.jpg
+
+    2. Old folder format:
+       images/004_KTM_250_Duke/
+       004_KTM_250_Duke_1.jpg
+
+    3. Older flat format:
+       images/4_ktm_250.jpg
+       images/4_KTM_250_Duke.jpg
+
+    4. Generic:
+       images/4_*.jpg
+    """
 
     try:
         bike_id = int(bike_id)
@@ -405,142 +214,347 @@ def get_primary_bike_image(
     ):
         return None
 
-    cache_key = (
-        bike_id,
-        str(brand or ""),
-        str(model or "")
-    )
 
-    if cache_key in _primary_image_cache:
-        return _primary_image_cache[cache_key]
+    # =====================================================
+    # 1. DATABASE IMAGE
+    # =====================================================
 
-    index = build_image_index()
+    try:
 
-    # 1. Current flat upload format: bike_12_1.jpg
-    current_prefix = f"bike_{bike_id}_".lower()
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
-    current_candidates = [
-        entry
-        for entry in index["all"]
-        if entry[2].lower().startswith(current_prefix)
-    ]
-
-    if current_candidates:
-
-        current_candidates.sort(
-            key=lambda item: (
-                _image_number_from_filename(item[2]),
-                item[2].lower()
-            )
+        cursor.execute(
+            """
+            SELECT
+                image_name
+            FROM bike_images
+            WHERE bike_id = %s
+            ORDER BY
+                display_order,
+                id
+            LIMIT 1
+            """,
+            (bike_id,)
         )
 
-        result = current_candidates[0][1]
-        _primary_image_cache[cache_key] = result
-        return result
+        image = cursor.fetchone()
 
-    # 2. Old folder format: 001_KTM_125_Duke/file.jpg
-    if brand is not None and model is not None:
+        cursor.close()
+        conn.close()
 
-        brand_clean = clean_folder_name(brand)
-        model_clean = clean_folder_name(model)
+        if image and image[0]:
 
-        folder_prefix = (
-            f"{bike_id:03d}_{brand_clean}_{model_clean}/"
-        ).lower()
+            result = find_image_file(
+                image[0]
+            )
 
-        folder_candidates = [
-            entry
-            for entry in index["all"]
-            if entry[1].lower().startswith(folder_prefix)
-        ]
+            if result:
 
-        if folder_candidates:
+                return result[1]
 
-            folder_candidates.sort(
+    except mysql.connector.Error:
+        pass
+
+
+    # =====================================================
+    # 2. CURRENT FLAT FORMAT
+    # =====================================================
+
+    for root in get_bike_image_roots():
+
+        files = []
+
+        try:
+
+            for filename in os.listdir(root):
+
+                file_path = os.path.join(
+                    root,
+                    filename
+                )
+
+                if not os.path.isfile(
+                    file_path
+                ):
+                    continue
+
+                extension = os.path.splitext(
+                    filename
+                )[1].lower()
+
+                if extension not in (
+                    ".jpg",
+                    ".jpeg",
+                    ".png",
+                    ".webp"
+                ):
+                    continue
+
+                match = re.fullmatch(
+                    rf"bike_{bike_id}_(\d+)"
+                    rf"\.(jpg|jpeg|png|webp)",
+                    filename,
+                    re.IGNORECASE
+                )
+
+                if match:
+
+                    number = int(
+                        match.group(1)
+                    )
+
+                    files.append(
+                        (
+                            number,
+                            filename.lower(),
+                            filename
+                        )
+                    )
+
+        except OSError:
+            continue
+
+        if files:
+
+            files.sort(
                 key=lambda item: (
-                    _image_number_from_filename(item[2]),
-                    item[2].lower()
+                    item[0],
+                    item[1]
                 )
             )
 
-            result = folder_candidates[0][1]
-            _primary_image_cache[cache_key] = result
-            return result
+            return files[0][2]
 
-    # 3. Older flat naming formats
-    brand_clean = clean_folder_name(brand) if brand is not None else ""
-    model_clean = clean_folder_name(model) if model is not None else ""
+
+    # =====================================================
+    # 3. OLD FOLDER FORMAT
+    # =====================================================
+
+    if (
+        brand is not None
+        and model is not None
+    ):
+
+        brand_clean = clean_folder_name(
+            brand
+        )
+
+        model_clean = clean_folder_name(
+            model
+        )
+
+        folder_name = (
+            f"{bike_id:03d}_"
+            f"{brand_clean}_"
+            f"{model_clean}"
+        )
+
+        for root in get_bike_image_roots():
+
+            folder_path = os.path.join(
+                root,
+                folder_name
+            )
+
+            if not os.path.isdir(
+                folder_path
+            ):
+                continue
+
+            files = []
+
+            try:
+
+                for filename in os.listdir(
+                    folder_path
+                ):
+
+                    file_path = os.path.join(
+                        folder_path,
+                        filename
+                    )
+
+                    if not os.path.isfile(
+                        file_path
+                    ):
+                        continue
+
+                    extension = os.path.splitext(
+                        filename
+                    )[1].lower()
+
+                    if extension not in (
+                        ".jpg",
+                        ".jpeg",
+                        ".png",
+                        ".webp"
+                    ):
+                        continue
+
+                    match = re.search(
+                        r"_(\d+)\.(jpg|jpeg|png|webp)$",
+                        filename,
+                        re.IGNORECASE
+                    )
+
+                    if match:
+
+                        number = int(
+                            match.group(1)
+                        )
+
+                    else:
+
+                        number = 9999
+
+                    files.append(
+                        (
+                            number,
+                            filename.lower(),
+                            filename
+                        )
+                    )
+
+            except OSError:
+                continue
+
+            if files:
+
+                files.sort(
+                    key=lambda item: (
+                        item[0],
+                        item[1]
+                    )
+                )
+
+                return (
+                    folder_name
+                    + "/"
+                    + files[0][2]
+                )
+
+
+    # =====================================================
+    # 4. OLD FLAT FILE NAMES
+    # =====================================================
+
+    possible_names = []
+
+    if brand is not None:
+        brand_clean = clean_folder_name(
+            brand
+        )
+    else:
+        brand_clean = ""
+
+    if model is not None:
+        model_clean = clean_folder_name(
+            model
+        )
+    else:
+        model_clean = ""
+
 
     if brand_clean and model_clean:
 
-        possible_names = [
-            f"{bike_id}_{brand_clean}_{model_clean}.jpg",
-            f"{bike_id}_{brand_clean}_{model_clean}.jpeg",
-            f"{bike_id}_{brand_clean}_{model_clean}.png",
-            f"{bike_id}_{brand_clean}_{model_clean}.webp",
-            f"{bike_id:03d}_{brand_clean}_{model_clean}.jpg",
-            f"{bike_id:03d}_{brand_clean}_{model_clean}.jpeg",
-            f"{bike_id:03d}_{brand_clean}_{model_clean}.png",
-            f"{bike_id:03d}_{brand_clean}_{model_clean}.webp"
-        ]
+        possible_names.extend(
+            [
+                f"{bike_id}_{brand_clean}_{model_clean}.jpg",
+                f"{bike_id}_{brand_clean}_{model_clean}.jpeg",
+                f"{bike_id}_{brand_clean}_{model_clean}.png",
+                f"{bike_id}_{brand_clean}_{model_clean}.webp",
 
-        for filename in possible_names:
-
-            entry = find_image_file(filename)
-
-            if entry:
-
-                result = entry[1]
-                _primary_image_cache[cache_key] = result
-                return result
-
-    # 4. Generic ID-prefixed image search
-    prefixes = (
-        f"{bike_id}_".lower(),
-        f"{bike_id:03d}_".lower(),
-        f"bike_{bike_id}_".lower()
-    )
-
-    generic_candidates = [
-        entry
-        for entry in index["all"]
-        if entry[2].lower().startswith(prefixes)
-    ]
-
-    if generic_candidates:
-
-        generic_candidates.sort(
-            key=lambda item: (
-                _image_number_from_filename(item[2]),
-                item[2].lower(),
-                item[1].lower()
-            )
+                f"{bike_id:03d}_{brand_clean}_{model_clean}.jpg",
+                f"{bike_id:03d}_{brand_clean}_{model_clean}.jpeg",
+                f"{bike_id:03d}_{brand_clean}_{model_clean}.png",
+                f"{bike_id:03d}_{brand_clean}_{model_clean}.webp"
+            ]
         )
 
-        result = generic_candidates[0][1]
-        _primary_image_cache[cache_key] = result
-        return result
 
-    _primary_image_cache[cache_key] = None
+    for filename in possible_names:
+
+        result = find_image_file(
+            filename
+        )
+
+        if result:
+
+            return result[1]
+
+
+    # =====================================================
+    # 5. SEARCH ANY IMAGE STARTING WITH BIKE ID
+    # =====================================================
+
+    prefixes = [
+        f"{bike_id}_",
+        f"{bike_id:03d}_",
+        f"bike_{bike_id}_"
+    ]
+
+    for root in get_bike_image_roots():
+
+        candidates = []
+
+        try:
+
+            for current_root, directories, files in os.walk(root):
+
+                for filename in files:
+
+                    extension = os.path.splitext(
+                        filename
+                    )[1].lower()
+
+                    if extension not in (
+                        ".jpg",
+                        ".jpeg",
+                        ".png",
+                        ".webp"
+                    ):
+                        continue
+
+                    lower_name = filename.lower()
+
+                    if any(
+                        lower_name.startswith(
+                            prefix.lower()
+                        )
+                        for prefix in prefixes
+                    ):
+
+                        relative_path = os.path.relpath(
+                            os.path.join(
+                                current_root,
+                                filename
+                            ),
+                            root
+                        )
+
+                        relative_path = relative_path.replace(
+                            "\\",
+                            "/"
+                        )
+
+                        candidates.append(
+                            relative_path
+                        )
+
+        except OSError:
+            continue
+
+        if candidates:
+
+            candidates.sort(
+                key=lambda x: x.lower()
+            )
+
+            return candidates[0]
+
+
     return None
-
-
-# =========================================================
-# IMAGE NUMBER HELPER
-# =========================================================
-
-def _image_number_from_filename(filename):
-
-    match = re.search(
-        r"_(\d+)\.(jpg|jpeg|png|webp)$",
-        str(filename),
-        re.IGNORECASE
-    )
-
-    if match:
-        return int(match.group(1))
-
-    return 999999
 
 
 # =========================================================
@@ -2165,22 +2179,97 @@ def bike_image(
     filename
 ):
 
-    filename = str(filename).replace(
+    """
+    Serve images from:
+
+    /images
+    /static/images
+
+    Also searches subfolders.
+    This fixes old filenames such as:
+
+        /images/4_ktm_250.jpg
+
+    and newer filenames such as:
+
+        /images/bike_4_1.jpg
+    """
+
+    filename = filename.replace(
         "\\",
         "/"
-    ).lstrip("/")
+    )
+
+
+    # -----------------------------------------------------
+    # SECURITY / NORMALIZATION
+    # -----------------------------------------------------
+
+    filename = filename.lstrip("/")
+
+
+    # -----------------------------------------------------
+    # DIRECT OR RECURSIVE SEARCH
+    # -----------------------------------------------------
 
     result = find_image_file(
         filename
     )
 
+
     if result:
 
+        image_root = result[0]
+        relative_path = result[1]
+
         return send_from_directory(
-            result[0],
-            result[1],
-            max_age=86400
+            image_root,
+            relative_path
         )
+
+
+    # -----------------------------------------------------
+    # CASE-INSENSITIVE SEARCH BY BASENAME
+    # -----------------------------------------------------
+
+    target = os.path.basename(
+        filename
+    ).lower()
+
+
+    for image_root in get_bike_image_roots():
+
+        try:
+
+            for current_root, directories, files in os.walk(
+                image_root
+            ):
+
+                for current_file in files:
+
+                    if current_file.lower() == target:
+
+                        relative_path = os.path.relpath(
+                            os.path.join(
+                                current_root,
+                                current_file
+                            ),
+                            image_root
+                        )
+
+                        relative_path = relative_path.replace(
+                            "\\",
+                            "/"
+                        )
+
+                        return send_from_directory(
+                            image_root,
+                            relative_path
+                        )
+
+        except OSError:
+            continue
+
 
     return (
         "Image not found: "
@@ -2273,8 +2362,7 @@ def bike_recommendation_image(
 
         return send_from_directory(
             result[0],
-            result[1],
-            max_age=86400
+            result[1]
         )
 
 
@@ -2925,9 +3013,6 @@ def delete_bike_image(
 
         except OSError:
             pass
-
-
-    clear_image_cache()
 
 
     return redirect(
@@ -3735,12 +3820,79 @@ def delete_bike(
                 pass
 
 
-    clear_image_cache()
+    return redirect(
+        url_for(
+            "admin_bikes"
+        )
+    )
+
+
+# =========================================================
+# ADMIN DELETE USER
+# =========================================================
+
+@app.route(
+    "/delete_user/<int:user_id>",
+    methods=["POST"]
+)
+def delete_user(user_id):
+
+    if "admin_id" not in session:
+
+        return redirect(
+            url_for(
+                "admin_login"
+            )
+        )
+
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+
+        # Remove records belonging to this user first so that
+        # foreign-key references do not block user deletion.
+        cursor.execute(
+            """
+            DELETE FROM test_rides
+            WHERE user_id = %s
+            """,
+            (user_id,)
+        )
+
+        cursor.execute(
+            """
+            DELETE FROM customer_doubts
+            WHERE user_id = %s
+            """,
+            (user_id,)
+        )
+
+        cursor.execute(
+            """
+            DELETE FROM users
+            WHERE id = %s
+            """,
+            (user_id,)
+        )
+
+        conn.commit()
+
+    except mysql.connector.Error:
+
+        conn.rollback()
+        raise
+
+    finally:
+
+        cursor.close()
+        conn.close()
 
 
     return redirect(
         url_for(
-            "admin_bikes"
+            "admin_users"
         )
     )
 
