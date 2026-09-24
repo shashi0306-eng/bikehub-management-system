@@ -1,1083 +1,266 @@
-{% extends "admin_base.html" %}
+{% extends "base.html" %}
 
 {% block title %}
 Customer Doubts - BikeHub
 {% endblock %}
 
-
-{% block extra_css %}
+{% block content %}
 
 <style>
 
-    /* =========================================
-       PAGE
-    ========================================= */
+.doubts-wrap{
+    max-width:1200px;
+    width:92%;
+    margin:auto;
+    padding-bottom:50px;
+}
 
-    .doubts-page {
+.doubts-head{
+    text-align:center;
+    margin-bottom:30px;
+}
 
-        width: 100%;
+.doubts-head h1{
+    color:#ff6600;
+    font-size:40px;
+    margin:0;
+}
 
-        padding-bottom: 50px;
+.doubts-head p{
+    color:#aaa;
+    margin-top:8px;
+}
+
+.doubt-card{
+    background:#1b1b1b;
+    border:1px solid #333;
+    border-radius:16px;
+    padding:25px;
+    margin:20px 0;
+    box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+
+.doubt-card:hover{
+    border-color:#ff6600;
+}
+
+.doubt-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    margin-bottom:15px;
+}
+
+.doubt-header h2{
+    color:#ff6600;
+    margin:0;
+    font-size:23px;
+}
+
+.status{
+    padding:7px 13px;
+    border-radius:20px;
+    background:#3a301d;
+    color:#ffbf5b;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.answered{
+    background:#183d24;
+    color:#5cff8a;
+}
+
+.customer{
+    color:#bbb;
+    font-size:14px;
+    margin-bottom:15px;
+    line-height:1.7;
+}
+
+.question-box{
+    background:#252525;
+    border-radius:10px;
+    padding:17px;
+    color:#ddd;
+    line-height:1.6;
+    margin-bottom:15px;
+}
+
+.previous-reply{
+    background:#202020;
+    border-left:3px solid #ff6600;
+    border-radius:7px;
+    padding:13px;
+    color:#ccc;
+    margin-bottom:14px;
+}
+
+.reply{
+    width:100%;
+    min-height:110px;
+    box-sizing:border-box;
+    background:#111;
+    border:1px solid #444;
+    border-radius:10px;
+    color:#fff;
+    padding:13px;
+    resize:vertical;
+    outline:none;
+    font-size:14px;
+}
+
+.reply:focus{
+    border-color:#ff6600;
+    box-shadow:0 0 0 3px rgba(255,102,0,.10);
+}
+
+.btn{
+    margin-top:12px;
+    background:#ff6600;
+    color:#fff;
+    border:0;
+    padding:12px 20px;
+    border-radius:9px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.btn:hover{
+    background:#e85d00;
+}
+
+.date{
+    color:#777;
+    margin-top:12px;
+    font-size:12px;
+}
+
+.empty{
+    text-align:center;
+    color:#777;
+    padding:50px 20px;
+    background:#1b1b1b;
+    border:1px solid #333;
+    border-radius:15px;
+}
+
+@media(max-width:700px){
+
+    .doubt-header{
+        align-items:flex-start;
+        flex-direction:column;
     }
 
-
-    /* =========================================
-       HEADER
-    ========================================= */
-
-    .doubts-header {
-
-        text-align: center;
-
-        padding: 35px 20px 30px;
+    .doubts-head h1{
+        font-size:31px;
     }
 
-
-    .doubts-header h1 {
-
-        margin: 0;
-
-        font-size: 42px;
-
-        font-weight: 900;
-
-        color: #ff6600;
+    .doubts-wrap{
+        width:94%;
     }
-
-
-    .doubts-header h1 span {
-
-        color: #ffffff;
-    }
-
-
-    .doubts-header p {
-
-        margin-top: 9px;
-
-        color: #999999;
-
-        font-size: 15px;
-    }
-
-
-    /* =========================================
-       SUMMARY
-    ========================================= */
-
-    .doubt-summary {
-
-        display: grid;
-
-        grid-template-columns:
-            repeat(3, 1fr);
-
-        gap: 18px;
-
-        margin:
-            0 25px 28px;
-    }
-
-
-    .summary-card {
-
-        background: #181818;
-
-        border: 1px solid #303030;
-
-        border-radius: 18px;
-
-        padding: 21px;
-
-        display: flex;
-
-        align-items: center;
-
-        gap: 15px;
-
-        transition: .25s;
-    }
-
-
-    .summary-card:hover {
-
-        border-color: #ff6600;
-
-        transform:
-            translateY(-3px);
-    }
-
-
-    .summary-icon {
-
-        width: 55px;
-
-        height: 55px;
-
-        display: grid;
-
-        place-items: center;
-
-        border-radius: 15px;
-
-        background:
-            rgba(255,102,0,.12);
-
-        font-size: 25px;
-    }
-
-
-    .summary-card small {
-
-        display: block;
-
-        color: #777777;
-
-        font-size: 11px;
-
-        font-weight: 700;
-
-        letter-spacing: 1px;
-
-        margin-bottom: 5px;
-    }
-
-
-    .summary-card strong {
-
-        color: #ffffff;
-
-        font-size: 24px;
-    }
-
-
-    /* =========================================
-       DOUBT CARD
-    ========================================= */
-
-    .doubt-card {
-
-        margin:
-            0 25px 20px;
-
-        padding: 25px;
-
-        background:
-            linear-gradient(
-                145deg,
-                rgba(255,255,255,.035),
-                rgba(255,255,255,.012)
-            ),
-            #181818;
-
-        border: 1px solid #303030;
-
-        border-radius: 20px;
-
-        transition: .25s;
-    }
-
-
-    .doubt-card:hover {
-
-        border-color:
-            rgba(255,102,0,.65);
-
-        box-shadow:
-            0 15px 35px
-            rgba(0,0,0,.25);
-    }
-
-
-    /* =========================================
-       TOP
-    ========================================= */
-
-    .doubt-top {
-
-        display: flex;
-
-        justify-content:
-            space-between;
-
-        align-items:
-            flex-start;
-
-        gap: 20px;
-
-        margin-bottom: 20px;
-    }
-
-
-    .doubt-title-area {
-
-        flex: 1;
-    }
-
-
-    .doubt-id {
-
-        color: #666666;
-
-        font-size: 11px;
-
-        font-weight: 800;
-
-        letter-spacing: 1px;
-
-        margin-bottom: 7px;
-    }
-
-
-    .doubt-title {
-
-        color: #ff6600;
-
-        font-size: 21px;
-
-        font-weight: 800;
-
-        margin: 0 0 9px;
-    }
-
-
-    .customer-details {
-
-        color: #888888;
-
-        font-size: 13px;
-
-        line-height: 1.7;
-    }
-
-
-    .customer-details strong {
-
-        color: #ffffff;
-    }
-
-
-    /* =========================================
-       STATUS
-    ========================================= */
-
-    .status {
-
-        display: inline-block;
-
-        padding:
-            8px 14px;
-
-        border-radius: 20px;
-
-        font-size: 11px;
-
-        font-weight: 800;
-
-        text-transform: uppercase;
-
-        white-space: nowrap;
-    }
-
-
-    .status-pending {
-
-        color: #ffc107;
-
-        background:
-            rgba(255,193,7,.12);
-
-        border:
-            1px solid
-            rgba(255,193,7,.25);
-    }
-
-
-    .status-answered {
-
-        color: #65df88;
-
-        background:
-            rgba(40,167,69,.12);
-
-        border:
-            1px solid
-            rgba(40,167,69,.25);
-    }
-
-
-    /* =========================================
-       QUESTION / REPLY
-    ========================================= */
-
-    .message-box {
-
-        padding: 18px;
-
-        border-radius: 13px;
-
-        margin-bottom: 17px;
-    }
-
-
-    .question-box {
-
-        background: #111111;
-
-        border:
-            1px solid #292929;
-    }
-
-
-    .reply-box {
-
-        background: #172017;
-
-        border:
-            1px solid #284428;
-    }
-
-
-    .message-label {
-
-        display: block;
-
-        font-size: 13px;
-
-        font-weight: 800;
-
-        margin-bottom: 9px;
-    }
-
-
-    .question-box
-    .message-label {
-
-        color: #ffffff;
-    }
-
-
-    .reply-box
-    .message-label {
-
-        color: #65df88;
-    }
-
-
-    .message-text {
-
-        color: #bbbbbb;
-
-        font-size: 14px;
-
-        line-height: 1.7;
-
-        margin: 0;
-
-        white-space: pre-wrap;
-
-        word-break: break-word;
-    }
-
-
-    /* =========================================
-       REPLY FORM
-    ========================================= */
-
-    .reply-form {
-
-        margin-top: 20px;
-
-        padding-top: 20px;
-
-        border-top:
-            1px solid #292929;
-    }
-
-
-    .reply-form label {
-
-        display: block;
-
-        color: #eeeeee;
-
-        font-size: 13px;
-
-        font-weight: 800;
-
-        margin-bottom: 9px;
-    }
-
-
-    .reply-form textarea {
-
-        width: 100%;
-
-        min-height: 115px;
-
-        resize: vertical;
-
-        box-sizing: border-box;
-
-        padding: 14px;
-
-        border-radius: 11px;
-
-        border:
-            1px solid #383838;
-
-        background: #111111;
-
-        color: #ffffff;
-
-        font-family: inherit;
-
-        font-size: 14px;
-
-        line-height: 1.6;
-
-        outline: none;
-
-        transition: .2s;
-    }
-
-
-    .reply-form textarea:focus {
-
-        border-color:
-            #ff6600;
-
-        box-shadow:
-            0 0 0 2px
-            rgba(255,102,0,.08);
-    }
-
-
-    .reply-form textarea::placeholder {
-
-        color: #666666;
-    }
-
-
-    /* =========================================
-       BUTTON
-    ========================================= */
-
-    .reply-actions {
-
-        margin-top: 12px;
-
-        display: flex;
-
-        justify-content:
-            flex-end;
-    }
-
-
-    .reply-btn {
-
-        border: none;
-
-        cursor: pointer;
-
-        padding:
-            12px 20px;
-
-        border-radius: 10px;
-
-        background: #ff6600;
-
-        color: #ffffff;
-
-        font-size: 13px;
-
-        font-weight: 800;
-
-        transition: .2s;
-    }
-
-
-    .reply-btn:hover {
-
-        background: #ff7a1a;
-
-        transform:
-            translateY(-2px);
-    }
-
-
-    /* =========================================
-       EMPTY
-    ========================================= */
-
-    .empty-doubts {
-
-        margin:
-            0 25px;
-
-        padding: 70px 20px;
-
-        text-align: center;
-
-        background: #181818;
-
-        border:
-            1px solid #303030;
-
-        border-radius: 20px;
-    }
-
-
-    .empty-icon {
-
-        font-size: 55px;
-
-        margin-bottom: 15px;
-    }
-
-
-    .empty-doubts h2 {
-
-        margin: 0 0 8px;
-
-        color: #ffffff;
-
-        font-size: 22px;
-    }
-
-
-    .empty-doubts p {
-
-        margin: 0;
-
-        color: #777777;
-
-        font-size: 14px;
-    }
-
-
-    /* =========================================
-       BACK BUTTON
-    ========================================= */
-
-    .back-area {
-
-        margin:
-            25px;
-    }
-
-
-    .back-button {
-
-        display: inline-block;
-
-        padding:
-            11px 18px;
-
-        border-radius: 10px;
-
-        border:
-            1px solid #444444;
-
-        background: #222222;
-
-        color: #ffffff;
-
-        text-decoration: none;
-
-        font-size: 13px;
-
-        font-weight: 800;
-
-        transition: .2s;
-    }
-
-
-    .back-button:hover {
-
-        color: #ff6600;
-
-        border-color:
-            #ff6600;
-    }
-
-
-    /* =========================================
-       TABLET
-    ========================================= */
-
-    @media(max-width:850px) {
-
-        .doubt-summary {
-
-            grid-template-columns: 1fr;
-
-            margin-left: 15px;
-
-            margin-right: 15px;
-        }
-
-
-        .doubt-card {
-
-            margin-left: 15px;
-
-            margin-right: 15px;
-        }
-
-
-        .empty-doubts {
-
-            margin-left: 15px;
-
-            margin-right: 15px;
-        }
-
-
-        .doubt-top {
-
-            flex-direction: column;
-        }
-
-    }
-
-
-    /* =========================================
-       MOBILE
-    ========================================= */
-
-    @media(max-width:600px) {
-
-        .doubts-header h1 {
-
-            font-size: 34px;
-        }
-
-
-        .doubt-card {
-
-            padding: 20px;
-        }
-
-
-        .reply-actions {
-
-            justify-content:
-                stretch;
-        }
-
-
-        .reply-btn {
-
-            width: 100%;
-        }
-
-    }
+}
 
 </style>
 
-{% endblock %}
+<div class="doubts-wrap">
 
+    <div class="doubts-head">
 
-
-{% block content %}
-
-<div class="doubts-page">
-
-
-    <!-- =========================================
-         HEADER
-    ========================================= -->
-
-    <section class="doubts-header">
-
-        <h1>
-
-            💬 <span>Customer</span> Doubts
-
-        </h1>
-
+        <h1>💬 Customer Doubts</h1>
 
         <p>
-
-            Read customer questions and
-            respond directly from the admin panel.
-
+            Read customer questions and send replies
         </p>
 
-    </section>
+    </div>
 
+    {% if doubts %}
 
+        {% for d in doubts %}
 
-    <!-- =========================================
-         SUMMARY
-    ========================================= -->
+        <div class="doubt-card">
 
-    <section class="doubt-summary">
+            <div class="doubt-header">
 
+                <h2>{{ d[4] }}</h2>
 
-        <!-- TOTAL -->
-
-        <div class="summary-card">
-
-            <div class="summary-icon">
-                💬
-            </div>
-
-            <div>
-
-                <small>
-                    TOTAL DOUBTS
-                </small>
-
-                <strong>
-                    {{ doubts|length }}
-                </strong>
+                <span class="status {% if d[7] == 'Answered' %}answered{% endif %}">
+                    {{ d[7] }}
+                </span>
 
             </div>
 
-        </div>
-
-
-
-        <!-- PENDING -->
-
-        <div class="summary-card">
-
-            <div class="summary-icon">
-                ⏳
+            <div class="customer">
+                <b>Customer:</b> {{ d[1] }}<br>
+                <b>Mobile:</b> {{ d[2] }}<br>
+                <b>Email:</b> {{ d[3] }}
             </div>
 
-            <div>
-
-                <small>
-                    PENDING
-                </small>
-
-                <strong>
-
-                    {{
-                        doubts
-                        |selectattr("7", "equalto", "Pending")
-                        |list
-                        |length
-                    }}
-
-                </strong>
-
+            <div class="question-box">
+                <b>Question:</b><br><br>
+                {{ d[5] }}
             </div>
 
-        </div>
+            {% if d[6] %}
 
-
-
-        <!-- ANSWERED -->
-
-        <div class="summary-card">
-
-            <div class="summary-icon">
-                ✅
+            <div class="previous-reply">
+                <b>Previous Reply:</b><br><br>
+                {{ d[6] }}
             </div>
 
-            <div>
+            {% endif %}
 
-                <small>
-                    ANSWERED
-                </small>
-
-                <strong>
-
-                    {{
-                        doubts
-                        |selectattr("7", "equalto", "Answered")
-                        |list
-                        |length
-                    }}
-
-                </strong>
-
-            </div>
-
-        </div>
-
-
-    </section>
-
-
-
-    <!-- =========================================
-         DOUBTS
-    ========================================= -->
-
-    {% for doubt in doubts %}
-
-
-    <div class="doubt-card">
-
-
-        <!-- =====================================
-             TOP INFORMATION
-        ====================================== -->
-
-        <div class="doubt-top">
-
-
-            <div class="doubt-title-area">
-
-                <div class="doubt-id">
-
-                    DOUBT #{{ doubt[0] }}
-
-                </div>
-
-
-                <h2 class="doubt-title">
-
-                    {{ doubt[4] }}
-
-                </h2>
-
-
-                <div class="customer-details">
-
-                    Customer:
-
-                    <strong>
-                        {{ doubt[1] }}
-                    </strong>
-
-                    &nbsp; • &nbsp;
-
-                    Mobile:
-
-                    <strong>
-                        {{ doubt[2] }}
-                    </strong>
-
-                    &nbsp; • &nbsp;
-
-                    Email:
-
-                    <strong>
-                        {{ doubt[3] }}
-                    </strong>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- STATUS -->
-
-            <div>
-
-                {% if doubt[7] == "Pending" %}
-
-                    <span
-                        class="status status-pending"
-                    >
-                        ⏳ Pending
-                    </span>
-
-                {% else %}
-
-                    <span
-                        class="status status-answered"
-                    >
-                        ✓ Answered
-                    </span>
-
-                {% endif %}
-
-            </div>
-
-
-        </div>
-
-
-
-        <!-- =====================================
-             CUSTOMER QUESTION
-        ====================================== -->
-
-        <div
-            class="message-box question-box"
-        >
-
-            <span class="message-label">
-
-                ❓ Customer Question
-
-            </span>
-
-
-            <p class="message-text">
-
-                {{ doubt[5] }}
-
-            </p>
-
-        </div>
-
-
-
-        <!-- =====================================
-             EXISTING ADMIN REPLY
-        ====================================== -->
-
-        {% if doubt[6] %}
-
-
-        <div
-            class="message-box reply-box"
-        >
-
-            <span class="message-label">
-
-                ✓ Admin Reply
-
-            </span>
-
-
-            <p class="message-text">
-
-                {{ doubt[6] }}
-
-            </p>
-
-        </div>
-
-
-        {% endif %}
-
-
-
-        <!-- =====================================
-             REPLY FORM
-        ====================================== -->
-
-        <div class="reply-form">
-
-
-            <form
-                method="POST"
-                action="{{ url_for('admin_doubts') }}"
-            >
-
+            <form method="POST">
 
                 <input
                     type="hidden"
                     name="doubt_id"
-                    value="{{ doubt[0] }}"
+                    value="{{ d[0] }}"
                 >
 
-
-                <label>
-
-                    {% if doubt[6] %}
-
-                        Update Reply
-
-                    {% else %}
-
-                        Reply to Customer
-
-                    {% endif %}
-
-                </label>
-
-
                 <textarea
+                    class="reply"
                     name="reply"
-                    placeholder="Type your reply to the customer here..."
+                    placeholder="Type admin reply..."
                     required
-                ></textarea>
+                >{{ d[6] or '' }}</textarea>
 
-
-                <div class="reply-actions">
-
-                    <button
-                        type="submit"
-                        class="reply-btn"
-                    >
-
-                        💬
-
-                        {% if doubt[6] %}
-
-                            Update Reply
-
-                        {% else %}
-
-                            Send Reply
-
-                        {% endif %}
-
-                    </button>
-
-                </div>
-
+                <button
+                    type="submit"
+                    class="btn"
+                >
+                    {% if d[6] %}
+                        ✏️ Update Reply
+                    {% else %}
+                        📤 Send Reply
+                    {% endif %}
+                </button>
 
             </form>
 
+            <div class="date">
+                Asked: {{ d[8] }}
+            </div>
 
         </div>
 
-
-    </div>
-
+        {% endfor %}
 
     {% else %}
 
-
-    <!-- =====================================
-         NO DOUBTS
-    ====================================== -->
-
-    <div class="empty-doubts">
-
-        <div class="empty-icon">
-            💬
+        <div class="empty">
+            <div style="font-size:42px;">💬</div>
+            <h2 style="color:#fff;">
+                No Customer Doubts
+            </h2>
+            <p>
+                There are currently no customer questions.
+            </p>
         </div>
 
-
-        <h2>
-            No Customer Doubts
-        </h2>
-
-
-        <p>
-
-            There are currently no customer
-            questions or support requests.
-
-        </p>
-
-    </div>
-
-
-    {% endfor %}
-
-
-
-    <!-- =========================================
-         BACK
-    ========================================= -->
-
-    <div class="back-area">
-
-        <a
-            href="{{ url_for('admin_dashboard') }}"
-            class="back-button"
-        >
-
-            ← Back to Dashboard
-
-        </a>
-
-    </div>
-
+    {% endif %}
 
 </div>
 

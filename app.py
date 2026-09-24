@@ -3238,71 +3238,93 @@ def admin_doubts():
     cursor = conn.cursor()
 
 
-    if request.method == "POST":
+    try:
 
-        doubt_id = request.form.get(
-            "doubt_id",
-            ""
-        )
+        # -------------------------------------------------
+        # SEND / UPDATE ADMIN REPLY
+        # -------------------------------------------------
 
-        reply = request.form.get(
-            "reply",
-            ""
-        ).strip()
+        if request.method == "POST":
 
-
-        if doubt_id and reply:
-
-            cursor.execute(
-                """
-                UPDATE customer_doubts
-                SET
-                    admin_reply = %s,
-                    status = 'Answered',
-                    replied_at =
-                        CURRENT_TIMESTAMP
-                WHERE id = %s
-                """,
-                (
-                    reply,
-                    doubt_id
-                )
+            doubt_id = request.form.get(
+                "doubt_id",
+                ""
             )
 
-            conn.commit()
+            reply = request.form.get(
+                "reply",
+                ""
+            ).strip()
 
 
-    cursor.execute(
-        """
-        SELECT
-            d.id,
-            u.name,
-            u.mobile,
-            u.email,
-            d.subject,
-            d.question,
-            d.admin_reply,
-            d.status,
-            d.created_at,
-            d.replied_at
-        FROM customer_doubts d
-        JOIN users u
-        ON d.user_id = u.id
-        ORDER BY
-            CASE
-                WHEN d.status = 'Pending'
-                THEN 0
-                ELSE 1
-            END,
-            d.id DESC
-        """
-    )
+            if doubt_id and reply:
+
+                cursor.execute(
+                    """
+                    UPDATE customer_doubts
+                    SET
+                        admin_reply = %s,
+                        status = 'Answered'
+                    WHERE id = %s
+                    """,
+                    (
+                        reply,
+                        doubt_id
+                    )
+                )
+
+                conn.commit()
 
 
-    doubts = cursor.fetchall()
+        # -------------------------------------------------
+        # GET ALL CUSTOMER DOUBTS
+        # -------------------------------------------------
 
-    cursor.close()
-    conn.close()
+        cursor.execute(
+            """
+            SELECT
+                d.id,
+                u.name,
+                u.mobile,
+                u.email,
+                d.subject,
+                d.question,
+                d.admin_reply,
+                d.status,
+                d.created_at
+            FROM customer_doubts d
+            JOIN users u
+            ON d.user_id = u.id
+            ORDER BY
+                CASE
+                    WHEN d.status = 'Pending'
+                    THEN 0
+                    ELSE 1
+                END,
+                d.id DESC
+            """
+        )
+
+
+        doubts = cursor.fetchall()
+
+
+    except mysql.connector.Error as e:
+
+        conn.rollback()
+
+        print(
+            "Admin Doubts Database Error:",
+            e
+        )
+
+        doubts = []
+
+
+    finally:
+
+        cursor.close()
+        conn.close()
 
 
     return render_template(
@@ -3852,74 +3874,6 @@ def delete_bike(
 
 
 # =========================================================
-# ADMIN - DELETE USER
-# =========================================================
-
-@app.route(
-    "/delete_user/<int:user_id>",
-    methods=["POST"]
-)
-def delete_user(user_id):
-
-    if "admin_id" not in session:
-
-        return redirect(
-            url_for("admin_login")
-        )
-
-
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-
-    try:
-
-        # Delete dependent records first.
-        cursor.execute(
-            """
-            DELETE FROM test_rides
-            WHERE user_id = %s
-            """,
-            (user_id,)
-        )
-
-        cursor.execute(
-            """
-            DELETE FROM customer_doubts
-            WHERE user_id = %s
-            """,
-            (user_id,)
-        )
-
-        # Delete the registered user.
-        cursor.execute(
-            """
-            DELETE FROM users
-            WHERE id = %s
-            """,
-            (user_id,)
-        )
-
-        conn.commit()
-
-    except mysql.connector.Error:
-
-        conn.rollback()
-
-        cursor.close()
-        conn.close()
-
-        return "Unable to delete user." , 500
-
-    cursor.close()
-    conn.close()
-
-    return redirect(
-        url_for("admin_users")
-    )
-
-
-# =========================================================
 # ADMIN USERS
 # =========================================================
 
@@ -3931,7 +3885,9 @@ def admin_users():
     if "admin_id" not in session:
 
         return redirect(
-            url_for("admin_login")
+            url_for(
+                "admin_login"
+            )
         )
 
 
@@ -3947,7 +3903,7 @@ def admin_users():
             mobile,
             email
         FROM users
-        ORDER BY id ASC
+        ORDER BY id DESC
         """
     )
 
