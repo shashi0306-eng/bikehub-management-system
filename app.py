@@ -243,42 +243,56 @@ def get_primary_bike_image(
     """
     Finds the first image for a bike.
 
-    Supported formats:
-
-    1. Database upload:
-       images/bike_4_1.jpg
-       images/bike_4_2.jpg
-
-    2. Old folder format:
-       images/004_KTM_250_Duke/
-       004_KTM_250_Duke_1.jpg
-
-    3. Older flat format:
-       images/4_ktm_250.jpg
-       images/4_KTM_250_Duke.jpg
-
-    4. Generic:
-       images/4_*.jpg
+    Priority:
+    1. Image filename stored in the bike_images database table.
+    2. Current flat image format: bike_<id>_<n>.<ext>.
+    3. Older folder format.
+    4. Older flat/generic image names.
     """
 
     try:
         bike_id = int(bike_id)
-    except (
-        ValueError,
-        TypeError
-    ):
+    except (ValueError, TypeError):
         return None
 
 
     # =====================================================
     # 1. DATABASE IMAGE
     # =====================================================
-    #
-    # Do not query MySQL here.
-    # /bikes and /search can process many bikes, and opening
-    # a database connection for every bike can exhaust the
-    # available Aiven connections. Image lookup is handled by
-    # the filesystem formats below.
+
+    # The image filename is stored in MySQL.  Reuse the existing
+    # pooled connection here and then verify that the corresponding
+    # file exists in the deployed image folders.
+    try:
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            SELECT image_name
+            FROM bike_images
+            WHERE bike_id = %s
+            ORDER BY display_order, id
+            LIMIT 1
+            """,
+            (bike_id,)
+        )
+
+        image = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        if image and image[0]:
+
+            result = find_image_file(image[0])
+
+            if result:
+                return result[1]
+
+    except mysql.connector.Error:
+        pass
 
 
     # =====================================================
@@ -293,25 +307,15 @@ def get_primary_bike_image(
 
             for filename in os.listdir(root):
 
-                file_path = os.path.join(
-                    root,
-                    filename
-                )
+                file_path = os.path.join(root, filename)
 
-                if not os.path.isfile(
-                    file_path
-                ):
+                if not os.path.isfile(file_path):
                     continue
 
-                extension = os.path.splitext(
-                    filename
-                )[1].lower()
+                extension = os.path.splitext(filename)[1].lower()
 
                 if extension not in (
-                    ".jpg",
-                    ".jpeg",
-                    ".png",
-                    ".webp"
+                    ".jpg", ".jpeg", ".png", ".webp"
                 ):
                     continue
 
@@ -324,16 +328,10 @@ def get_primary_bike_image(
 
                 if match:
 
-                    number = int(
-                        match.group(1)
-                    )
+                    number = int(match.group(1))
 
                     files.append(
-                        (
-                            number,
-                            filename.lower(),
-                            filename
-                        )
+                        (number, filename.lower(), filename)
                     )
 
         except OSError:
@@ -342,10 +340,7 @@ def get_primary_bike_image(
         if files:
 
             files.sort(
-                key=lambda item: (
-                    item[0],
-                    item[1]
-                )
+                key=lambda item: (item[0], item[1])
             )
 
             return files[0][2]
@@ -355,18 +350,10 @@ def get_primary_bike_image(
     # 3. OLD FOLDER FORMAT
     # =====================================================
 
-    if (
-        brand is not None
-        and model is not None
-    ):
+    if brand is not None and model is not None:
 
-        brand_clean = clean_folder_name(
-            brand
-        )
-
-        model_clean = clean_folder_name(
-            model
-        )
+        brand_clean = clean_folder_name(brand)
+        model_clean = clean_folder_name(model)
 
         folder_name = (
             f"{bike_id:03d}_"
@@ -376,43 +363,26 @@ def get_primary_bike_image(
 
         for root in get_bike_image_roots():
 
-            folder_path = os.path.join(
-                root,
-                folder_name
-            )
+            folder_path = os.path.join(root, folder_name)
 
-            if not os.path.isdir(
-                folder_path
-            ):
+            if not os.path.isdir(folder_path):
                 continue
 
             files = []
 
             try:
 
-                for filename in os.listdir(
-                    folder_path
-                ):
+                for filename in os.listdir(folder_path):
 
-                    file_path = os.path.join(
-                        folder_path,
-                        filename
-                    )
+                    file_path = os.path.join(folder_path, filename)
 
-                    if not os.path.isfile(
-                        file_path
-                    ):
+                    if not os.path.isfile(file_path):
                         continue
 
-                    extension = os.path.splitext(
-                        filename
-                    )[1].lower()
+                    extension = os.path.splitext(filename)[1].lower()
 
                     if extension not in (
-                        ".jpg",
-                        ".jpeg",
-                        ".png",
-                        ".webp"
+                        ".jpg", ".jpeg", ".png", ".webp"
                     ):
                         continue
 
@@ -422,22 +392,10 @@ def get_primary_bike_image(
                         re.IGNORECASE
                     )
 
-                    if match:
-
-                        number = int(
-                            match.group(1)
-                        )
-
-                    else:
-
-                        number = 9999
+                    number = int(match.group(1)) if match else 9999
 
                     files.append(
-                        (
-                            number,
-                            filename.lower(),
-                            filename
-                        )
+                        (number, filename.lower(), filename)
                     )
 
             except OSError:
@@ -446,17 +404,10 @@ def get_primary_bike_image(
             if files:
 
                 files.sort(
-                    key=lambda item: (
-                        item[0],
-                        item[1]
-                    )
+                    key=lambda item: (item[0], item[1])
                 )
 
-                return (
-                    folder_name
-                    + "/"
-                    + files[0][2]
-                )
+                return folder_name + "/" + files[0][2]
 
 
     # =====================================================
@@ -465,51 +416,31 @@ def get_primary_bike_image(
 
     possible_names = []
 
-    if brand is not None:
-        brand_clean = clean_folder_name(
-            brand
-        )
-    else:
-        brand_clean = ""
-
-    if model is not None:
-        model_clean = clean_folder_name(
-            model
-        )
-    else:
-        model_clean = ""
-
+    brand_clean = clean_folder_name(brand) if brand is not None else ""
+    model_clean = clean_folder_name(model) if model is not None else ""
 
     if brand_clean and model_clean:
 
-        possible_names.extend(
-            [
-                f"{bike_id}_{brand_clean}_{model_clean}.jpg",
-                f"{bike_id}_{brand_clean}_{model_clean}.jpeg",
-                f"{bike_id}_{brand_clean}_{model_clean}.png",
-                f"{bike_id}_{brand_clean}_{model_clean}.webp",
+        for extension in ("jpg", "jpeg", "png", "webp"):
 
-                f"{bike_id:03d}_{brand_clean}_{model_clean}.jpg",
-                f"{bike_id:03d}_{brand_clean}_{model_clean}.jpeg",
-                f"{bike_id:03d}_{brand_clean}_{model_clean}.png",
-                f"{bike_id:03d}_{brand_clean}_{model_clean}.webp"
-            ]
-        )
+            possible_names.append(
+                f"{bike_id}_{brand_clean}_{model_clean}.{extension}"
+            )
 
+            possible_names.append(
+                f"{bike_id:03d}_{brand_clean}_{model_clean}.{extension}"
+            )
 
     for filename in possible_names:
 
-        result = find_image_file(
-            filename
-        )
+        result = find_image_file(filename)
 
         if result:
-
             return result[1]
 
 
     # =====================================================
-    # 5. SEARCH ANY IMAGE STARTING WITH BIKE ID
+    # 5. ANY IMAGE STARTING WITH BIKE ID
     # =====================================================
 
     prefixes = [
@@ -528,53 +459,33 @@ def get_primary_bike_image(
 
                 for filename in files:
 
-                    extension = os.path.splitext(
-                        filename
-                    )[1].lower()
+                    extension = os.path.splitext(filename)[1].lower()
 
                     if extension not in (
-                        ".jpg",
-                        ".jpeg",
-                        ".png",
-                        ".webp"
+                        ".jpg", ".jpeg", ".png", ".webp"
                     ):
                         continue
 
                     lower_name = filename.lower()
 
                     if any(
-                        lower_name.startswith(
-                            prefix.lower()
-                        )
+                        lower_name.startswith(prefix.lower())
                         for prefix in prefixes
                     ):
 
                         relative_path = os.path.relpath(
-                            os.path.join(
-                                current_root,
-                                filename
-                            ),
+                            os.path.join(current_root, filename),
                             root
-                        )
+                        ).replace("\\", "/")
 
-                        relative_path = relative_path.replace(
-                            "\\",
-                            "/"
-                        )
-
-                        candidates.append(
-                            relative_path
-                        )
+                        candidates.append(relative_path)
 
         except OSError:
             continue
 
         if candidates:
 
-            candidates.sort(
-                key=lambda x: x.lower()
-            )
-
+            candidates.sort(key=lambda value: value.lower())
             return candidates[0]
 
 
@@ -3238,93 +3149,71 @@ def admin_doubts():
     cursor = conn.cursor()
 
 
-    try:
+    if request.method == "POST":
 
-        # -------------------------------------------------
-        # SEND / UPDATE ADMIN REPLY
-        # -------------------------------------------------
+        doubt_id = request.form.get(
+            "doubt_id",
+            ""
+        )
 
-        if request.method == "POST":
+        reply = request.form.get(
+            "reply",
+            ""
+        ).strip()
 
-            doubt_id = request.form.get(
-                "doubt_id",
-                ""
+
+        if doubt_id and reply:
+
+            cursor.execute(
+                """
+                UPDATE customer_doubts
+                SET
+                    admin_reply = %s,
+                    status = 'Answered',
+                    replied_at =
+                        CURRENT_TIMESTAMP
+                WHERE id = %s
+                """,
+                (
+                    reply,
+                    doubt_id
+                )
             )
 
-            reply = request.form.get(
-                "reply",
-                ""
-            ).strip()
+            conn.commit()
 
 
-            if doubt_id and reply:
-
-                cursor.execute(
-                    """
-                    UPDATE customer_doubts
-                    SET
-                        admin_reply = %s,
-                        status = 'Answered'
-                    WHERE id = %s
-                    """,
-                    (
-                        reply,
-                        doubt_id
-                    )
-                )
-
-                conn.commit()
-
-
-        # -------------------------------------------------
-        # GET ALL CUSTOMER DOUBTS
-        # -------------------------------------------------
-
-        cursor.execute(
-            """
-            SELECT
-                d.id,
-                u.name,
-                u.mobile,
-                u.email,
-                d.subject,
-                d.question,
-                d.admin_reply,
-                d.status,
-                d.created_at
-            FROM customer_doubts d
-            JOIN users u
-            ON d.user_id = u.id
-            ORDER BY
-                CASE
-                    WHEN d.status = 'Pending'
-                    THEN 0
-                    ELSE 1
-                END,
-                d.id DESC
-            """
-        )
+    cursor.execute(
+        """
+        SELECT
+            d.id,
+            u.name,
+            u.mobile,
+            u.email,
+            d.subject,
+            d.question,
+            d.admin_reply,
+            d.status,
+            d.created_at,
+            d.replied_at
+        FROM customer_doubts d
+        JOIN users u
+        ON d.user_id = u.id
+        ORDER BY
+            CASE
+                WHEN d.status = 'Pending'
+                THEN 0
+                ELSE 1
+            END,
+            d.id DESC
+        """
+    )
 
 
-        doubts = cursor.fetchall()
+    doubts = cursor.fetchall()
 
-
-    except mysql.connector.Error as e:
-
-        conn.rollback()
-
-        print(
-            "Admin Doubts Database Error:",
-            e
-        )
-
-        doubts = []
-
-
-    finally:
-
-        cursor.close()
-        conn.close()
+    cursor.close()
+    conn.close()
 
 
     return render_template(
